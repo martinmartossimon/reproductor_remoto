@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cliente</title>
+    <style>
+        /* Estilos para el contenedor principal */
+        .contenedor {
+            display: flex; /* Utiliza un diseño flexible con dos columnas */
+        }
+
+        /* Estilos para el div del video (columna izquierda) */
+        .video {
+            flex: 80%; /* Ocupa el 80% del ancho disponible */
+            background-color: #f0f0f0; /* Color de fondo (puedes cambiarlo) */
+            padding: 10px; /* Espaciado interno (ajusta según tus necesidades) */
+        }
+        
+        /* Estilos para el video dentro del div */
+        .video video {
+            width: 100%; /* Ocupa todo el ancho del div del video */
+        }
+
+        /* Estilos para la lista de videos (columna derecha) */
+        .lista-videos {
+            flex: 20%; /* Ocupa el 20% del ancho disponible */
+            background-color: #e0e0e0; /* Color de fondo (puedes cambiarlo) */
+            padding: 10px; /* Espaciado interno (ajusta según tus necesidades) */
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor">
+        <div class="video">
+            <video id="videoPlayer" controls preload="auto">
+                <source src="/contenido/5OOkVkq3BN8.mp4" type="video/mp4">
+                Tu navegador no admite la reproducción de videos.
+            </video>
+        </div>
+        <div class="lista-videos">
+            <h2>Lista de Videos:</h2>
+            <ul id="listaVideos"></ul>
+        </div>
+    </div>
+    <script>
+        // Obtener la referencia a la lista HTML y al reproductor de video
+        const listaVideos = document.getElementById('listaVideos');
+        const videoPlayer = document.getElementById('videoPlayer');
+        
+        // Realizar una solicitud GET al endpoint /listar_archivos
+        fetch('/listar_archivos')
+            .then(response => response.json()) // Parsear la respuesta JSON
+            .then(data => {
+                // Iterar sobre la lista de nombres de archivos y construir las rutas completas
+                data.forEach(nombreArchivo => {
+                    const rutaCompleta = `/contenido/${nombreArchivo}`; // Ajusta la ruta según tu estructura de servidor
+                    const li = document.createElement('li');
+                    li.textContent = nombreArchivo; // Mostrar el nombre del archivo en la lista
+                    li.setAttribute('data-src', rutaCompleta); // Establecer la ruta completa como atributo personalizado
+                    listaVideos.appendChild(li);
+                });
+            })
+            .catch(error => {
+                console.error('Error al obtener la lista de archivos:', error);
+            });
+        
+        // Agregar un manejador de eventos al hacer clic en elementos de lista
+        listaVideos.addEventListener('click', function (event) {
+            if (event.target.tagName === 'LI') {
+                const videoSrc = event.target.getAttribute('data-src');
+                
+                // Cambiar el atributo src del reproductor de video
+                videoPlayer.setAttribute('src', videoSrc);
+                
+                // Recargar y reproducir el video
+                videoPlayer.load();
+                videoPlayer.play();
+            }
+        });
+    </script>
+    
+</body>
+</html>
