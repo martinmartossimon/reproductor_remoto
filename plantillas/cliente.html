@@ -40,6 +40,11 @@
             background-color: #007bff; /* Color de fondo seleccionado (puedes cambiarlo) */
             color: white; /* Color de texto seleccionado (puedes cambiarlo) */
         }
+
+        .anadir {
+            padding: 5px;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -54,6 +59,9 @@
             <h2>Lista de Videos:</h2>
             <ul id="listaVideos"></ul>
         </div>
+    </div>
+    <div class="anadir">
+        Añadir Enlace: <input type="text" id="url" size="100" placeholder="https://www.youtube.com/watch?v=wMye9FkQEfo"><button>Enviar</button>
     </div>
     <script>
         // Obtener la referencia a la lista HTML y al reproductor de video
