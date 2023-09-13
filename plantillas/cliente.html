@@ -14,7 +14,7 @@
         /* Estilos para el div del video (columna izquierda) */
         .video {
             flex: 80%; /* Ocupa el 80% del ancho disponible */
-            background-color: #f0f0f0; /* Color de fondo (puedes cambiarlo) */
+            background-color: #300202; /* Color de fondo (puedes cambiarlo) */
             padding: 10px; /* Espaciado interno (ajusta según tus necesidades) */
         }
         
@@ -24,10 +24,21 @@
         }
 
         /* Estilos para la lista de videos (columna derecha) */
-        .lista-videos {
-            flex: 20%; /* Ocupa el 20% del ancho disponible */
-            background-color: #e0e0e0; /* Color de fondo (puedes cambiarlo) */
-            padding: 10px; /* Espaciado interno (ajusta según tus necesidades) */
+        /* Estilos para la lista de videos */
+        .lista-videos ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .lista-videos li {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        /* Estilo para el video seleccionado */
+        .video-seleccionado {
+            background-color: #007bff; /* Color de fondo seleccionado (puedes cambiarlo) */
+            color: white; /* Color de texto seleccionado (puedes cambiarlo) */
         }
     </style>
 </head>
@@ -67,18 +78,36 @@
             });
         
         // Agregar un manejador de eventos al hacer clic en elementos de lista
-        listaVideos.addEventListener('click', function (event) {
-            if (event.target.tagName === 'LI') {
-                const videoSrc = event.target.getAttribute('data-src');
-                
-                // Cambiar el atributo src del reproductor de video
-                videoPlayer.setAttribute('src', videoSrc);
-                
-                // Recargar y reproducir el video
-                videoPlayer.load();
-                videoPlayer.play();
-            }
-        });
+        function seleccionarVideo(elemento) {
+            // Obtén todos los elementos de la lista
+            var listaVideos = document.querySelectorAll('.lista-videos li');
+
+            // Quita la clase de seleccionado de todos los elementos de la lista
+            listaVideos.forEach(function (item) {
+                item.classList.remove('video-seleccionado');
+            });
+
+            // Agrega la clase de seleccionado al elemento clicado
+            elemento.classList.add('video-seleccionado');
+
+            // Aquí puedes realizar otras acciones, como cargar el video seleccionado en el reproductor
+            const videoSrc = elemento.getAttribute('data-src');
+
+            // Cambiar el atributo src del reproductor de video
+            videoPlayer.setAttribute('src', videoSrc);
+
+            // Recargar y reproducir el video
+            videoPlayer.load();
+            videoPlayer.play();
+    }
+
+    // Escuchar clics en la lista de videos
+    var listaVideos2 = document.querySelector('.lista-videos ul');
+    listaVideos2.addEventListener('click', function (event) {
+        if (event.target.tagName === 'LI') {
+            seleccionarVideo(event.target);
+        }
+    });
     </script>
     
 </body>
