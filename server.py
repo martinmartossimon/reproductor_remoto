@@ -58,14 +58,18 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 pathBuscado='Archivo no encontrado en: .' + template_path + "cliente.html"
                 self.wfile.write(pathBuscado.encode())
-        # Servicio del contenidos
+        # Servicio del contenidos de manera progresiva.
         elif self.path.startswith('/contenido/'):
-            # Sirve archivos estáticos desde la carpeta "contenido"
+            # Sirve archivos de video desde la carpeta "contenido"
             try:
                 with open('.' + self.path, 'rb') as file:
                     content = file.read()
-                self.send_response(200)
+                self.send_response(206)  # Código de respuesta parcial (206 Partial Content)
                 self.send_header('Content-type', 'video/mp4')  # Ajusta el tipo de contenido según tus archivos
+                self.send_header('Accept-Ranges', 'bytes')  # Indica que el servidor admite solicitudes parciales
+                file_size = len(content)
+                self.send_header('Content-Length', file_size)  # Indica el tamaño total del archivo
+                self.send_header('Content-Range', f'bytes 0-{file_size-1}/{file_size}')  # Indica el rango de bytes enviado
                 self.end_headers()
                 self.wfile.write(content)
             except FileNotFoundError:
