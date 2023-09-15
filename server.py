@@ -7,6 +7,8 @@ import os
 
 
 directorio = "./contenido"
+mensajes = []
+
 
 def listar_archivos():
     print("Entro a listar_archivos()")
@@ -86,31 +88,48 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 response_data = json.dumps(archivos)
                 self.wfile.write(response_data.encode())
+        ######
+        #elif self.path == '/sse':
+        #    self.send_response(200)
+        #    self.send_header('Content-Type', 'text/event-stream')
+        #    self.send_header('Cache-Control', 'no-cache')
+        #    self.send_header('Connection', 'keep-alive')
+        #    self.end_headers()
+        #    
+            # Enviar mensajes almacenados como eventos SSE
+        #    for mensaje in mensajes:
+        #        self.wfile.write(f"data: {mensaje}\n\n".encode())
+        #        self.wfile.flush()
         else:
             self.send_response(404)
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
             self.wfile.write("Endpoint no encontrado".encode())
 
-    #def do_POST(self):
-    #    if self.path == '/servidor':
-    #        content_length = int(self.headers['Content-Length'])
-    #        post_data = self.rfile.read(content_length)
-    #        post_data = json.loads(post_data.decode())
-    #        
-    #        # Actualizar los datos con los recibidos en la solicitud POST
-    #        data.update(post_data)
-    #        
-    #        self.send_response(200)
-    #        self.send_header('Content-type', 'text/plain')
-    #        self.end_headers()
-    #        #self.wfile.write("Datos actualizados".encode())
-    #        self.wfile.write("Servidor")
-    #    else:
-    #        self.send_response(404)
-    #        self.send_header('Content-type', 'text/plain')
-    #        self.end_headers()
-    #        self.wfile.write("Endpoint no encontrado".encode())
+    def do_POST(self):
+        if self.path == '/urlDownloader':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            post_data = json.loads(post_data.decode())
+       
+            # Actualizar los datos con los recibidos en la solicitud POST
+            #data.update(post_data)
+            print("Datos recibidos en la llamada: " + post_data)
+            print("Ahora llamaría al descargador, si fuese posible en un hilo aparte")
+            
+            mensajes.append(f"Acción ha finalizado: {post_data}")
+
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(post_data.encode())
+            #self.wfile.write("URL Recivida!! " + str(post_data))
+            #self.wfile.write("Servidor")
+        else:
+            self.send_response(404)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write("Endpoint no encontrado".encode())
 
 # Configurar el servidor para escuchar en el puerto 8000
 with socketserver.TCPServer(("", 8000), RequestHandler) as httpd:

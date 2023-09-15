@@ -45,13 +45,34 @@
             padding: 5px;
             align-items: center;
         }
+
+         /* Estilos para el mensaje emergente */
+        .popup {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #4CAF50; /* Fondo verde */
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px; /* Esquinas redondeadas */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        } 
     </style>
 </head>
 <body>
+    <div class="anadir">
+        Añadir Enlace: <input type="text" id="url" size="100" placeholder="https://www.youtube.com/watch?v=wMye9FkQEfo"><button id="enviar">Enviar</button>
+        <div id="popup" class="popup">
+            <!-- Contenido del mensaje emergente -->
+            URL agreada!!
+        </div>
+    </div>
     <div class="contenedor">
         <div class="video">
             <video id="videoPlayer" controls preload="auto">
-                <source src="/contenido/5OOkVkq3BN8.mp4" type="video/mp4">
+                <source src="" type="video/mp4">
                 Tu navegador no admite la reproducción de videos.
             </video>
         </div>
@@ -60,14 +81,14 @@
             <ul id="listaVideos"></ul>
         </div>
     </div>
-    <div class="anadir">
-        Añadir Enlace: <input type="text" id="url" size="100" placeholder="https://www.youtube.com/watch?v=wMye9FkQEfo"><button>Enviar</button>
-    </div>
     <script>
         // Obtener la referencia a la lista HTML y al reproductor de video
         const listaVideos = document.getElementById('listaVideos');
         const videoPlayer = document.getElementById('videoPlayer');
         
+        //***************************************************************
+        //         REQUEST PARA OBTENER DATOS DE LA LISTA DE VIDEOS
+        //***************************************************************
         // Realizar una solicitud GET al endpoint /listar_archivos
         fetch('/listar_archivos')
             .then(response => response.json()) // Parsear la respuesta JSON
@@ -85,6 +106,10 @@
                 console.error('Error al obtener la lista de archivos:', error);
             });
         
+
+        //***************************************************************
+        //         CAMBIAR EL VIDEO EN REPRODUCCION
+        //***************************************************************
         // Agregar un manejador de eventos al hacer clic en elementos de lista
         function seleccionarVideo(elemento) {
             // Obtén todos los elementos de la lista
@@ -107,15 +132,84 @@
             // Recargar y reproducir el video
             videoPlayer.load();
             videoPlayer.play();
-    }
-
-    // Escuchar clics en la lista de videos
-    var listaVideos2 = document.querySelector('.lista-videos ul');
-    listaVideos2.addEventListener('click', function (event) {
-        if (event.target.tagName === 'LI') {
-            seleccionarVideo(event.target);
         }
-    });
+
+
+        //***************************************************************
+        //         ENVIAR DATOS PARA DESCARGAR VIDEO DE URL
+        //***************************************************************
+        function enviarDatos() {
+            // Obtener el valor del input
+            contenido = document.getElementById('url').value;
+
+            // Crear un objeto JSON con el contenido
+            const datos = '{ "url": "' + contenido + '" }';
+            console.log("Json enviado: " + JSON.stringify(datos));
+
+            // Realizar la solicitud HTTP POST
+            fetch('http://localhost:8000/urlDownloader', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datos)
+            })
+            .then(response => response.json())
+            .then(data => {
+            // Procesar la respuesta del endpoint
+                console.log('Respuesta del endpoint:', data);
+                document.getElementById('url').value="";
+                contenido.placeholder="Siguiente URL...";
+                // Aquí debería venir un mensaje emergente
+                mostrarPopup("URL Añadida"); 
+            })
+            .catch(error => {
+                console.error('Error al enviar los datos:', error);
+            });
+        }
+
+        //***************************************************************
+        //         MOSTRAR POPUP
+        //***************************************************************
+        function mostrarPopup(mensaje) {
+            var popup = document.getElementById("popup");
+            popup.innerText = mensaje;
+            popup.style.display = "block";
+
+            // Ocultar el mensaje emergente después de 3 segundos
+            setTimeout(function() {
+                popup.style.display = "none";
+            }, 1500); // 3000 milisegundos = 3 segundos
+        }
+
+
+        //***************************************************************
+        //         WEBHOOK POPUP
+        //***************************************************************
+        // Establecer conexión SSE
+        //const eventSource = new EventSource("/sse");
+
+        // Escuchar eventos del servidor
+        //eventSource.addEventListener("mensaje", (event) => {
+        //    const mensaje = event.data;
+        //    mostrarPopup(mensaje);
+        //});
+
+
+
+        //***************************************************************
+        //         AÑADIR EVENTOS A LA LISTA DE VIDEOS Y AL BOTON ENVIAR
+        //***************************************************************
+        // Asignar la función al evento click del botón
+        document.getElementById('enviar').addEventListener('click', enviarDatos);
+
+        // Escuchar clics en la lista de videos
+        var listaVideos2 = document.querySelector('.lista-videos ul');
+        listaVideos2.addEventListener('click', function (event) {
+            if (event.target.tagName === 'LI') {
+                seleccionarVideo(event.target);
+            }
+        });
     </script>
     
 </body>
