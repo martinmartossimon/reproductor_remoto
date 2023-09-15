@@ -1,0 +1,28 @@
+#!/bin/bash
+
+URL=$1
+
+#yt-dlp -f 'best[height<=1080]+bestaudio/best' -o "./contenido/%(title)s.%(ext)s" $URL
+yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "./contenido/%(title)s.%(ext)s" $URL
+
+
+echo "---------RENOMBRANDO--------"
+cd ./contenido/
+
+# Itera sobre los archivos en el directorio
+for archivo in *; do
+  # Verifica si el archivo es un archivo regular
+  if [ -f "$archivo" ]; then
+    # Obtén la extensión del archivo
+    extension="${archivo##*.}"
+    
+    # Elimina caracteres especiales y espacios en blanco, y mantiene el "."
+    nuevo_nombre=$(echo "$archivo" | sed 's/[^a-zA-Z0-9.]/_/g')
+    
+    # Trunca la longitud del nombre del archivo a 10 caracteres (sin contar la extensión)
+    nuevo_nombre=$(echo "$nuevo_nombre" | cut -c 1-15)".$extension"
+    
+    # Renombra el archivo
+    mv "$archivo" "$nuevo_nombre"
+  fi
+done
