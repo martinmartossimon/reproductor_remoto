@@ -183,6 +183,7 @@
         }
 
 
+
         //***************************************************************
         //         WEBHOOK POPUP
         //***************************************************************
@@ -210,6 +211,43 @@
                 seleccionarVideo(event.target);
             }
         });
+
+
+        /****************************************
+        * Actualizador del contenido de la lista
+        ********************************/
+       function actualizarListaArchivos(){
+
+            console.log("Actualizando el contenido de la lista de archivos");
+
+            //Limpio la lista primero
+            while(listaVideos.firstChild){
+                listaVideos.removeChild(listaVideos.firstChild);
+            }
+
+
+            // Traigo la nueva lista
+            fetch('/listar_archivos')
+            .then(response => response.json()) // Parsear la respuesta JSON
+            .then(data => {
+                // Iterar sobre la lista de nombres de archivos y construir las rutas completas
+                data.forEach(nombreArchivo => {
+                    const rutaCompleta = `/contenido/${nombreArchivo}`; // Ajusta la ruta según tu estructura de servidor
+                    const li = document.createElement('li');
+                    li.textContent = nombreArchivo; // Mostrar el nombre del archivo en la lista
+                    li.setAttribute('data-src', rutaCompleta); // Establecer la ruta completa como atributo personalizado
+                    listaVideos.appendChild(li);
+                });
+            })
+            .catch(error => {
+                console.error('Error al obtener la lista de archivos:', error);
+            });
+       }
+
+       document.addEventListener("DOMContentLoaded", function() {
+            setInterval(actualizarListaArchivos, 5000); // 5000 milisegundos = 5 segundos
+        });
+
     </script>
     
 </body>
