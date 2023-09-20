@@ -5,7 +5,13 @@ LOG=/home/tincho/Scripts/reproductor_remoto/logDownloader.log
 URL=$1
 echo "`date +'%d/%m/%Y %H:%M:%S'` - Llamado a descargador con URL: $URL" > $LOG
 #yt-dlp -f 'best[height<=1080]+bestaudio/best' -o "./contenido/%(title)s.%(ext)s" $URL
-/usr/bin/yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "./contenido/%(title)s.%(ext)s" $URL
+
+#Lo descarga en 4K, y lo limito
+#/usr/bin/yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "./contenido/%(title)s.%(ext)s" $URL
+
+#Lo descarga max en 1080
+/usr/bin/yt-dlp -f 'best[height<=1080]+bestaudio/best' -o "./contenido/%(title)s.%(ext)s" $URL
+
 pid=$!
 echo "Arrancado el yt-dlp con el PID: $pid" >> $LOG
 
