@@ -1,15 +1,21 @@
 #!/bin/bash
 
+LOG=/home/tincho/Scripts/reproductor_remoto/logDownloader.log
+
 URL=$1
-
+echo "`date +'%d/%m/%Y %H:%M:%S'` - Llamado a descargador con URL: $URL" > $LOG
 #yt-dlp -f 'best[height<=1080]+bestaudio/best' -o "./contenido/%(title)s.%(ext)s" $URL
-yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "./contenido/%(title)s.%(ext)s" $URL
+/usr/bin/yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "./contenido/%(title)s.%(ext)s" $URL
+pid=$!
+echo "Arrancado el yt-dlp con el PID: $pid" >> $LOG
 
-
-echo "---------RENOMBRANDO--------"
+wait $pid
+echo "Finaliza el yt-dlp con el PID: $pid" >> $LOG
+echo "`date +'%d/%m/%Y %H:%M:%S'` - Fin de la descarga->RENOMBRANDO--------" >> $LOG
 cd ./contenido/
 
 # Itera sobre los archivos en el directorio
+#for archivo in *; do
 for archivo in *; do
   # Verifica si el archivo es un archivo regular
   if [ -f "$archivo" ]; then
@@ -17,7 +23,8 @@ for archivo in *; do
     extension="${archivo##*.}"
     
     # Elimina caracteres especiales y espacios en blanco, y mantiene el "."
-    nuevo_nombre=$(echo "$archivo" | sed 's/[^a-zA-Z0-9.]/_/g')
+    #nuevo_nombre=$(echo "$archivo" | sed 's/[^a-zA-Z0-9.]/_/g')
+    nuevo_nombre=$(echo "$archivo" | sed 's/[^a-zA-Z0-9.]//g; s/á/a/g; s/é/e/g; s/í/i/g; s/ó/o/g; s/ú/u/g')
     
     # Trunca la longitud del nombre del archivo a 10 caracteres (sin contar la extensión)
     nuevo_nombre=$(echo "$nuevo_nombre" | cut -c 1-15)".$extension"
@@ -26,3 +33,5 @@ for archivo in *; do
     mv "$archivo" "$nuevo_nombre"
   fi
 done
+
+echo "`date +'%d/%m/%Y %H:%M:%S'` - Fin del RENOMBRANDO" >> $LOG
