@@ -16,6 +16,7 @@ cd ./contenido/
 
 # Itera sobre los archivos en el directorio
 #for archivo in *; do
+echo "`date +'%d/%m/%Y %H:%M:%S'` - Renombrando Archivos Descargados"
 for archivo in *; do
   # Verifica si el archivo es un archivo regular
   if [ -f "$archivo" ]; then
@@ -24,7 +25,7 @@ for archivo in *; do
     
     # Elimina caracteres especiales y espacios en blanco, y mantiene el "."
     #nuevo_nombre=$(echo "$archivo" | sed 's/[^a-zA-Z0-9.]/_/g')
-    nuevo_nombre=$(echo "$archivo" | sed 's/[^a-zA-Z0-9.]//g; s/á/a/g; s/é/e/g; s/í/i/g; s/ó/o/g; s/ú/u/g')
+    nuevo_nombre=$(echo "$archivo" | sed 's/[^a-zA-Z0-9.]//g; s/á/a/g; s/é/e/g; s/í/i/g; s/ó/o/g; s/ú/u/g; s/Á/A/g; s/É/E/g; s/Í/i/g; s/Ó/O/g; s/Ú/U/g')
     
     # Trunca la longitud del nombre del archivo a 10 caracteres (sin contar la extensión)
     nuevo_nombre=$(echo "$nuevo_nombre" | cut -c 1-15)".$extension"
