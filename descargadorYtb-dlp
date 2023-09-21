@@ -35,9 +35,10 @@ for archivo in *; do
     
     # Trunca la longitud del nombre del archivo a 10 caracteres (sin contar la extensión)
     nuevo_nombre=$(echo "$nuevo_nombre" | cut -c 1-15)".$extension"
-    
+    if [[ "$archivo" != "$nuevo_nombre" ]]; then
     # Renombra el archivo
-    mv "$archivo" "$nuevo_nombre"
+      mv "$archivo" "$nuevo_nombre"
+    fi
   fi
 done
 

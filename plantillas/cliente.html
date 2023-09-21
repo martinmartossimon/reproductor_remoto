@@ -60,6 +60,7 @@
             z-index: 999;
         } 
     </style>
+    <link rel="icon" href="/contenido/favicon.ico" type="image/x-icon">
 </head>
 <body>
     <div class="anadir">
@@ -139,6 +140,11 @@
         //         ENVIAR DATOS PARA DESCARGAR VIDEO DE URL
         //***************************************************************
         function enviarDatos() {
+
+            var host = window.location.host;
+            var endpoint = '/urlDownloader';
+            var url = 'http://' + host + endpoint;
+
             // Obtener el valor del input
             contenido = document.getElementById('url').value;
 
@@ -147,7 +153,8 @@
             console.log("Json enviado: " + JSON.stringify(datos));
 
             // Realizar la solicitud HTTP POST
-            fetch('http://localhost:8000/urlDownloader', {
+            //fetch('http://localhost:8000/urlDownloader', {
+            fetch(url, {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json'
@@ -245,7 +252,7 @@
        }
 
        document.addEventListener("DOMContentLoaded", function() {
-            setInterval(actualizarListaArchivos, 5000); // 5000 milisegundos = 5 segundos
+            setInterval(actualizarListaArchivos, 15000); // 5000 milisegundos = 5 segundos
         });
 
     </script>

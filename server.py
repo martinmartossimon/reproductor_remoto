@@ -17,7 +17,8 @@ def listar_archivos():
     print("Entro a listar_archivos()")
     try:
         #archivos = os.listdir(directorio)
-        archivos = [nombre for nombre in os.listdir(directorio) if not nombre.startswith('.')]
+        #archivos = [nombre for nombre in os.listdir(directorio) if not nombre.startswith('.')]
+        archivos = [nombre for nombre in os.listdir(directorio) if nombre.endswith('.mp4')]
         print("Listado de archivos leidos: " + str(archivos))
         return archivos
     except Exception as e:
