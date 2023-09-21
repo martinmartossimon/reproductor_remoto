@@ -18,7 +18,7 @@ echo "Arrancado el yt-dlp con el PID: $pid" >> $LOG
 wait $pid
 echo "Finaliza el yt-dlp con el PID: $pid" >> $LOG
 echo "`date +'%d/%m/%Y %H:%M:%S'` - Fin de la descarga->RENOMBRANDO--------" >> $LOG
-cd ./contenido/
+cd ./contenido/ || exit 2
 
 # Itera sobre los archivos en el directorio
 #for archivo in *; do
