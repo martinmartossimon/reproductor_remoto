@@ -19,8 +19,18 @@ def listar_archivos():
         #archivos = os.listdir(directorio)
         #archivos = [nombre for nombre in os.listdir(directorio) if not nombre.startswith('.')]
         archivos = [nombre for nombre in os.listdir(directorio) if nombre.endswith('.mp4')]
+        # Ordena la lista de archivos por fecha de creación ascendente
+        # Ordena la lista de archivos por fecha de creación ascendente
+        archivos_ordenados = sorted(archivos, key=lambda x: os.path.getctime(os.path.join(directorio, x)))
+
+        # Invierte la lista para tener el orden más reciente primero
+        #archivos_ordenados = archivos_ordenados[::-1]
+
         print("Listado de archivos leidos: " + str(archivos))
-        return archivos
+        print("Listado de archivos leidos ordenados: " + str(archivos_ordenados))
+
+        #return archivos
+        return archivos_ordenados
     except Exception as e:
         return str(e)
 
