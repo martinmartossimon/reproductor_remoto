@@ -11,10 +11,10 @@ import time
 
 directorio = "./contenido"
 mensajes = []
-
+clientes = []
 
 def listar_archivos():
-    print("Entro a listar_archivos()")
+    #print("Entro a listar_archivos()")
     try:
         #archivos = os.listdir(directorio)
         #archivos = [nombre for nombre in os.listdir(directorio) if not nombre.startswith('.')]
@@ -26,8 +26,8 @@ def listar_archivos():
         # Invierte la lista para tener el orden más reciente primero
         #archivos_ordenados = archivos_ordenados[::-1]
 
-        print("Listado de archivos leidos: " + str(archivos))
-        print("Listado de archivos leidos ordenados: " + str(archivos_ordenados))
+        #print("Listado de archivos leidos: " + str(archivos))
+        #print("Listado de archivos leidos ordenados: " + str(archivos_ordenados))
 
         #return archivos
         return archivos_ordenados
@@ -142,18 +142,25 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 response_data = json.dumps(archivos)
                 self.wfile.write(response_data.encode())
-        ######
-        #elif self.path == '/sse':
-        #    self.send_response(200)
-        #    self.send_header('Content-Type', 'text/event-stream')
-        #    self.send_header('Cache-Control', 'no-cache')
-        #    self.send_header('Connection', 'keep-alive')
-        #    self.end_headers()
-        #    
-            # Enviar mensajes almacenados como eventos SSE
-        #    for mensaje in mensajes:
-        #        self.wfile.write(f"data: {mensaje}\n\n".encode())
-        #        self.wfile.flush()
+        
+        elif self.path == '/addCliente':
+            # Obtiene la dirección IP del remitente
+            client_ip = self.client_address[0]
+            print("IP del remitente recibida en /addCliente:", client_ip)
+            if client_ip not in clientes:
+                    clientes.append(client_ip)
+                    print("Nueva IP agregada a la lista:", client_ip, " Lista -> ", str(clientes))
+            
+            # Prepara la respuesta JSON
+            response_data = {"estado": "Alive"}
+            response_json = json.dumps(response_data)
+            # Envia la respuesta
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(response_json.encode())
+    
+    
         else:
             self.send_response(404)
             self.send_header('Content-type', 'text/plain')

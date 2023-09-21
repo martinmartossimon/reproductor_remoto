@@ -83,6 +83,7 @@
     </div>
     <div class="detalleActualizacion">
         <span id="ultimaActualizacion"></span>
+        <span id="estadoCliente"></span>
     </div>
     <script>
 
@@ -180,13 +181,30 @@
             });
         }
 
+        function registrarCliente(){
+            console.log("Cliente Alive send")
+            fetch('/addCliente', {
+                method: 'GET', // Puedes ajustar el método según tu API
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Actualiza el contenido en el elemento con ID "resultado"
+                document.getElementById('estadoCliente').textContent = JSON.stringify(data);
+            })
+            .catch(error => {
+                console.error('Error al consultar el endpoint:', error);
+            });
+        }
+
         /* 
         * Listeners 
         */
         document.getElementById('enviar').addEventListener('click', enviarDatos);
         document.addEventListener("DOMContentLoaded", function() {
             setInterval(actualizarListado, 15000); // 5000 milisegundos = 5 segundos
+            //setInterval(registrarCliente, 2000);
             actualizarListado();
+            registrarCliente();
         });
     </script>
 </body>
