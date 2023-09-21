@@ -111,7 +111,10 @@
                         const fila = document.createElement('tr');
                         fila.innerHTML = `
                             <td>${nombreArchivo}</td>
-                            <td><button>Reproducir</button><button>Borrar</button></td>
+                            <td>
+                                <button onclick="reproducirVideo('${nombreArchivo}')">Reproducir</button>
+                                <button onclick="borrarVideo('${nombreArchivo}')">Borrar</button>
+                            </td>
                             <td>${nombreArchivo}</td>
                         `;
 
@@ -194,6 +197,50 @@
             .catch(error => {
                 console.error('Error al consultar el endpoint:', error);
             });
+        }
+
+        function reproducirVideo(idVideo) {
+            console.log(`Reproducir video con ID: ${idVideo}`);
+            // Aquí puedes agregar el código para reproducir el video según el ID proporcionado
+            // Datos que quieres enviar en formato JSON
+            const datos = {
+                accion: "reproducir",
+                video: `${idVideo}`
+            };
+            console.log("Datos: " + JSON.stringify(datos));
+
+            // URL del endpoint al que deseas enviar los datos
+            const endpointURL = '/reproducirVideo';
+
+            // Opciones de la solicitud
+            const opciones = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datos)
+            };
+
+            // Realiza la solicitud al servidor
+            fetch(endpointURL, opciones)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Error en la solicitud');
+                    }
+                })
+                .then(data => {
+                    console.log('Respuesta del servidor:', data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function borrarVideo(idVideo) {
+            console.log(`Borrar video con ID: ${idVideo}`);
+            // Aquí puedes agregar el código para borrar el video según el ID proporcionado
         }
 
         /* 

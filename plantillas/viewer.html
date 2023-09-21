@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Asegura que el contenido ocupe al menos el 100% de la altura de la ventana */
+            background-color: #f0f0f0; /* Cambia el color de fondo si lo deseas */
+        }
+
+        .contenedor {
+            background-color: black;
+            text-align: center; /* Centra el contenido dentro del contenedor */
+        }
+
+        .video {
+            width: 100%;
+            max-width: 100%; /* Asegura que el video no sea más ancho que el contenedor */
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor">
+        <div class="video">
+            <video id="videoPlayer" controls preload="auto" autoplay>
+                <source src="" type="video/mp4">
+                Tu navegador no admite la reproducción de videos.
+            </video>
+        </div>
+    </div>
+    <button id="botonReproducir">Reproducir</button>
+    <script>
+        const videoPlayer = document.getElementById('videoPlayer');
+
+        var host = window.location.hostname;
+        var endpoint = '/eventos';
+        var url = 'http://' + host + ":8001" + endpoint;
+        const eventSource = new EventSource(url);
+        //const eventSource = new EventSource('http://localhost:8001/eventos');
+
+        // Maneja eventos recibidos del servidor
+        eventSource.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            console.log("Recibido mensaje!: " + data);
+
+            // Verifica si el evento es de tipo "reproducir"
+            if (data.accion === "reproducir") {
+                // Obtiene el nombre del video del evento
+                const videoNombre = data.video;
+
+                // Reproduce el video utilizando el nombre recibido
+                reproducirVideo(videoNombre);
+            }
+        };
+
+        function reproducirVideo(videoNombre) {
+            // Aquí debes escribir la lógica para reproducir el video
+            // Puedes utilizar un reproductor de video HTML5, como el siguiente ejemplo:
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.src = `/contenido/${videoNombre}`; // Ajusta la ruta según tu estructura de servidor
+            videoPlayer.load(); // Carga el video
+            videoPlayer.play(); // Reproduce el video
+        }
+    </script>
+</body>
+</html>
