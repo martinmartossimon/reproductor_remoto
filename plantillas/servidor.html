@@ -5,8 +5,184 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Servidor</title>
+    <style>
+    .popup {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: #4CAF50; /* Fondo verde */
+        color: #fff;
+        padding: 10px;
+        border-radius: 10px; /* Esquinas redondeadas */
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+    table {
+    width: 100%;
+    border-collapse: collapse;
+    }
+
+    /* Estilo para las celdas de encabezado th */
+    th {
+        background-color: #333; /* Color de fondo para las celdas de encabezado */
+        color: white; /* Color de texto para las celdas de encabezado */
+        padding: 10px; /* Espaciado interno */
+        text-align: left; /* Alineación del texto a la izquierda */
+        border-radius: 5px; /* Bordes redondeados */
+    }
+
+    /* Estilo para las filas pares */
+    tr:nth-child(even) {
+        background-color: #f2f2f2; /* Color de fondo para filas pares */
+    }
+
+    /* Estilo para las filas impares */
+    tr:nth-child(odd) {
+        background-color: #ffffff; /* Color de fondo para filas impares */
+    }
+
+    /* Estilo para las celdas de datos td */
+    td {
+        padding: 10px; /* Espaciado interno */
+        text-align: left; /* Alineación del texto a la izquierda */
+        border-radius: 5px; /* Bordes redondeados */
+        border: 1px solid #ddd; /* Borde con color de fondo */
+    }
+    </style>
 </head>
 <body>
-    <h1>Servidor y el concho del calamar:</h1>
+    <h1>Servidor:</h1>
+    <div class="anadir">
+        Añadir Enlace: <input type="text" id="url" size="100" placeholder="https://www.youtube.com/watch?v=wMye9FkQEfo"><button id="enviar">Enviar</button>
+        <div id="popup" class="popup">
+            <!-- Contenido del mensaje emergente -->
+            URL agreada!!
+        </div>
+    </div>
+    <br>
+    <div id="listaDeReproduccion">
+        <table id="tablaListaReproduccion">
+            <thead>
+                <tr>
+                    <th>Archivo</th>
+                    <th>Accion</th>
+                    <th>Destalle</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-body">
+                <!-- Aquí se agregarán las filas dinámicamente -->
+            </tbody>
+        </table>
+        
+    </div>
+    <div class="detalleActualizacion">
+        <span id="ultimaActualizacion"></span>
+    </div>
+    <script>
+
+        /* 
+        * ACTUALIZAR EL LISTADO
+        */
+        function actualizarListado(){
+            console.log("Actualizando el listado...")
+            const tablaBody = document.getElementById('tabla-body');
+
+            while (tablaBody.firstChild) {
+                tablaBody.removeChild(tablaBody.firstChild);
+            }
+
+            fetch('/listar_archivos')
+                .then(response => response.json()) // Parsear la respuesta JSON
+                .then(data => {
+                    // Iterar sobre la lista de nombres de archivos y construir las rutas completas
+                    data.forEach(nombreArchivo => {
+                        const rutaCompleta = `/contenido/${nombreArchivo}`; // Ajusta la ruta según tu estructura de servidor
+                        //const li = document.createElement('li');
+                        //li.textContent = nombreArchivo; // Mostrar el nombre del archivo en la lista
+                        //li.setAttribute('data-src', rutaCompleta); // Establecer la ruta completa como atributo personalizado
+                        //listaVideos.appendChild(li);
+                        const fila = document.createElement('tr');
+                        fila.innerHTML = `
+                            <td>${nombreArchivo}</td>
+                            <td><button>Reproducir</button><button>Borrar</button></td>
+                            <td>${nombreArchivo}</td>
+                        `;
+
+                    tablaBody.appendChild(fila);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al obtener la lista de archivos:', error);
+                });
+            
+            const fechaHora = new Date(); // Obtiene la fecha y hora actual
+            const formatoFechaHora = fechaHora.toLocaleString(); // Convierte la fecha y hora a una cadena legible
+            etiquetaUpdate = document.getElementById("ultimaActualizacion");
+            etiquetaUpdate.innerHTML = "<p>Ultima actualizacion: " + formatoFechaHora + "</p>"; 
+        }
+
+        //***************************************************************
+        //         MOSTRAR POPUP
+        //***************************************************************
+        function mostrarPopup(mensaje) {
+            var popup = document.getElementById("popup");
+            popup.innerText = mensaje;
+            popup.style.display = "block";
+
+            // Ocultar el mensaje emergente después de 3 segundos
+            setTimeout(function() {
+                popup.style.display = "none";
+            }, 1500); // 3000 milisegundos = 3 segundos
+        }
+
+
+        //***************************************************************
+        //         ENVIAR DATOS PARA DESCARGAR VIDEO DE URL
+        //***************************************************************
+        function enviarDatos() {
+            var host = window.location.host;
+            var endpoint = '/urlDownloader';
+            var url = 'http://' + host + endpoint;
+
+            // Obtener el valor del input
+            contenido = document.getElementById('url').value;
+
+            // Crear un objeto JSON con el contenido
+            const datos = { "url": contenido }
+            console.log("Json enviado: " + JSON.stringify(datos));
+
+            // Realizar la solicitud HTTP POST
+            //fetch('http://localhost:8000/urlDownloader', {
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datos)
+            })
+            .then(response => response.json())
+            .then(data => {
+            // Procesar la respuesta del endpoint
+                console.log('Respuesta del endpoint:', data);
+                document.getElementById('url').value="";
+                contenido.placeholder="Siguiente URL...";
+                // Aquí debería venir un mensaje emergente
+                mostrarPopup("URL Añadida"); 
+            })
+            .catch(error => {
+                console.error('Error al enviar los datos:', error);
+            });
+        }
+
+        /* 
+        * Listeners 
+        */
+        document.getElementById('enviar').addEventListener('click', enviarDatos);
+        document.addEventListener("DOMContentLoaded", function() {
+            setInterval(actualizarListado, 15000); // 5000 milisegundos = 5 segundos
+            actualizarListado();
+        });
+    </script>
 </body>
 </html>
