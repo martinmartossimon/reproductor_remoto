@@ -54,10 +54,20 @@
         border-radius: 5px; /* Bordes redondeados */
         border: 1px solid #ddd; /* Borde con color de fondo */
     }
+
+    /* Estilo para las filas marcadas con la clase 'seleccionada' */
+    .seleccionada {
+        background-color: lime !important;
+    }
+
+    
     </style>
 </head>
 <body>
     <h1>Servidor:</h1>
+    <div class="controlesReproduccion">
+
+    </div>
     <div class="anadir">
         Añadir Enlace: <input type="text" id="url" size="100" placeholder="https://www.youtube.com/watch?v=wMye9FkQEfo"><button id="enviar">Enviar</button>
         <div id="popup" class="popup">
@@ -87,48 +97,65 @@
     </div>
     <script>
 
+        // Variables Globales
+        let ultimaFilaMarcada = null;
+        // Lista de detalles de archivos
+        let listaArchivos = [];
+        let idSeleccionado = 0;
+
         /* 
         * ACTUALIZAR EL LISTADO
         */
         function actualizarListado(){
-            console.log("Actualizando el listado...")
-            const tablaBody = document.getElementById('tabla-body');
+            console.log("Actualizando el listado...");
+            console.log("idSeleccionado; "+ idSeleccionado);
+
+            tablaBody = document.getElementById('tabla-body');
 
             while (tablaBody.firstChild) {
                 tablaBody.removeChild(tablaBody.firstChild);
             }
 
             fetch('/listar_archivos')
-                .then(response => response.json()) // Parsear la respuesta JSON
-                .then(data => {
-                    // Iterar sobre la lista de nombres de archivos y construir las rutas completas
-                    data.forEach(nombreArchivo => {
-                        const rutaCompleta = `/contenido/${nombreArchivo}`; // Ajusta la ruta según tu estructura de servidor
-                        //const li = document.createElement('li');
-                        //li.textContent = nombreArchivo; // Mostrar el nombre del archivo en la lista
-                        //li.setAttribute('data-src', rutaCompleta); // Establecer la ruta completa como atributo personalizado
-                        //listaVideos.appendChild(li);
-                        const fila = document.createElement('tr');
-                        fila.innerHTML = `
-                            <td>${nombreArchivo}</td>
-                            <td>
-                                <button onclick="reproducirVideo('${nombreArchivo}')">Reproducir</button>
-                                <button onclick="borrarVideo('${nombreArchivo}')">Borrar</button>
-                            </td>
-                            <td>${nombreArchivo}</td>
-                        `;
+            .then(response => response.json()) // Parsear la respuesta JSON
+            .then(data => {
+                // Reinicializar la lista de archivos
+                listaArchivos = [];
+
+                // Iterar sobre la lista de nombres de archivos y construir las rutas completas
+                data.forEach((nombreArchivo, index) => {
+                    const rutaCompleta = `/contenido/${nombreArchivo}`; // Ajusta la ruta según tu estructura de servidor
+                    const fila = document.createElement('tr');
+                    fila.dataset.id = index + 1; // Asignar un ID numérico a la fila
+                    fila.dataset.nombrearchivo = nombreArchivo; // Guardar el nombre del archivo
+                    listaArchivos.push({ id: index + 1, nombre: nombreArchivo }); // Agregar detalles a la lista
+
+                    fila.innerHTML = `
+                        <td>${nombreArchivo}</td>
+                        <td>
+                            <button onclick="reproducirVideo(this)">Reproducir</button>
+                            <button onclick="borrarVideo('${nombreArchivo}', this)">Borrar</button>
+                        </td>
+                        <td>${nombreArchivo}</td>
+                    `;
 
                     tablaBody.appendChild(fila);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error al obtener la lista de archivos:', error);
                 });
-            
+                // Aquí, dentro del callback de fetch, puedes acceder a filaValorActualizar
+                const filaValorActualizar = tablaBody.querySelector(`tr[data-id="${idSeleccionado}"]`);
+                if (filaValorActualizar) {
+                    filaValorActualizar.style.backgroundColor = "lime";
+                    filaValorActualizar.classList.add('seleccionado')
+                    console.log("/listar_archivos - valor de filaValorActualizar:" + filaValorActualizar);
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener la lista de archivos:', error);
+            });
             const fechaHora = new Date(); // Obtiene la fecha y hora actual
             const formatoFechaHora = fechaHora.toLocaleString(); // Convierte la fecha y hora a una cadena legible
             etiquetaUpdate = document.getElementById("ultimaActualizacion");
-            etiquetaUpdate.innerHTML = "<p>Ultima actualizacion: " + formatoFechaHora + "</p>"; 
+            etiquetaUpdate.innerHTML = "<p>Ultima actualizacion: " + formatoFechaHora + "</p>";
         }
 
         //***************************************************************
@@ -199,49 +226,84 @@
             });
         }
 
-        function reproducirVideo(idVideo) {
-            console.log(`Reproducir video con ID: ${idVideo}`);
-            // Aquí puedes agregar el código para reproducir el video según el ID proporcionado
-            // Datos que quieres enviar en formato JSON
-            const datos = {
-                accion: "reproducir",
-                video: `${idVideo}`
-            };
-            console.log("Datos: " + JSON.stringify(datos));
+        function reproducirVideo(button) {
 
-            // URL del endpoint al que deseas enviar los datos
-            const endpointURL = '/reproducirVideo';
+            // Limpio todas las classes seleccionada
+            const tablaBody = document.getElementById('tabla-body');
+            const filas = tablaBody.getElementsByTagName('tr');
+            for (let i = 0; i < filas.length; i++) {
+                filas[i].classList.remove('seleccionada');
+            }
+            //Cambio también la propiedad del anterior
+            idAnterior = idSeleccionado;
+            const filaValorActualizar = tablaBody.querySelector(`tr[data-id="${idAnterior}"]`);
+                if (filaValorActualizar) {
+                    filaValorActualizar.style.backgroundColor = "";
+                    //filaValorActualizar.classList.add('seleccionado')
+                    //console.log("/listar_archivos - valor de filaValorActualizar:" + filaValorActualizar);
+                }
 
-            // Opciones de la solicitud
-            const opciones = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(datos)
-            };
+            // Obtener la fila seleccionada
+            const fila = button.closest('tr');
+            const idFila = fila.dataset.id;
 
-            // Realiza la solicitud al servidor
-            fetch(endpointURL, opciones)
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Error en la solicitud');
-                    }
-                })
-                .then(data => {
-                    console.log('Respuesta del servidor:', data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+            console.log(`Reproducir video con ID: ${idFila}`);
+
+            // Buscar el archivo correspondiente en la lista de archivos
+            const archivoSeleccionado = listaArchivos.find(archivo => archivo.id === Number(idFila));
+
+            if (archivoSeleccionado) {
+                const nombreArchivo = archivoSeleccionado.nombre;
+
+                // Aquí puedes agregar el código para reproducir el video según el nombre del archivo
+                // Datos que quieres enviar en formato JSON
+                const datos = {
+                    accion: "reproducir",
+                    video: nombreArchivo // Utiliza el nombre del archivo en lugar de idVideo
+                };
+                console.log("Datos: " + JSON.stringify(datos));
+
+                // URL del endpoint al que deseas enviar los datos
+                const endpointURL = '/reproducirVideo';
+
+                // Opciones de la solicitud
+                const opciones = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(datos)
+                };
+
+                // Realiza la solicitud al servidor
+                fetch(endpointURL, opciones)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            throw new Error('Error en la solicitud');
+                        }
+                    })
+                    .then(data => {
+                        console.log('Respuesta del servidor:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+
+                // Marcar la fila en verde
+                fila.classList.add('seleccionada');
+                idSeleccionado = idFila
+                console.log("Elemento (en reproducir) idSeleccionado: " + idSeleccionado);
+                console.log("Lista: " + listaArchivos);
+            }
         }
 
         function borrarVideo(idVideo) {
             console.log(`Borrar video con ID: ${idVideo}`);
             // Aquí puedes agregar el código para borrar el video según el ID proporcionado
         }
+        
 
         /* 
         * Listeners 
