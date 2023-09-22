@@ -6,94 +6,193 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Servidor</title>
     <style>
-    .popup {
-        display: none;
-        position: absolute;
-        top: 0;
-        left: 0;
-        background-color: #4CAF50; /* Fondo verde */
-        color: #fff;
-        padding: 10px;
-        border-radius: 10px; /* Esquinas redondeadas */
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-        z-index: 999;
-    }
-    table {
-    width: 100%;
-    border-collapse: collapse;
-    }
+        .contenido {
+            display: grid;
+            grid-template-columns: 75% 25%; /* Divide en dos columnas, 75% y 25% */
+            background-color: #1369cc; /* Color de fondo de la fila */
+            border: 1px solid #ddd; /* Borde para separar las columnas */
+        }
 
-    /* Estilo para las celdas de encabezado th */
-    th {
-        background-color: #333; /* Color de fondo para las celdas de encabezado */
-        color: white; /* Color de texto para las celdas de encabezado */
-        padding: 10px; /* Espaciado interno */
-        text-align: left; /* Alineación del texto a la izquierda */
-        border-radius: 5px; /* Bordes redondeados */
-    }
+ 
+        #listaDeReproduccion {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Alinea al centro horizontalmente */
+            justify-content: flex-start; /* Alinea arriba verticalmente */
+            max-height: 490px;
+            overflow-y: auto;
+        }
 
-    /* Estilo para las filas pares */
-    tr:nth-child(even) {
-        background-color: #f2f2f2; /* Color de fondo para filas pares */
-    }
+        /* Estilos para la parte derecha (clientes) */
+        #Controles {
+            background-color: #4CAF50;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Alinea al centro horizontalmente */
+        }
 
-    /* Estilo para las filas impares */
-    tr:nth-child(odd) {
-        background-color: #ffffff; /* Color de fondo para filas impares */
-    }
+        #DivMiniatura,
+        #DivTablaClientes,
+        #DivControlesReproduccion {
+            margin: 20px 0; /* Agrega 20px de margen vertical */
+        }
 
-    /* Resaltado de la linea seleccionada */
-    tr:hover {
-        background-color: yellow; /* Cambia el color de fondo a amarillo cuando se pasa el mouse */
-    }
+        #tablaListaReproduccion td{
+            border-spacing: 1px; /* Ajusta el espacio entre filas y columnas, puedes cambiar el valor según tus preferencias */
+        }
 
-    /* Estilo para las celdas de datos td */
-    td {
-        padding: 10px; /* Espaciado interno */
-        text-align: left; /* Alineación del texto a la izquierda */
-        border-radius: 5px; /* Bordes redondeados */
-        border: 1px solid #ddd; /* Borde con color de fondo */
-    }
+        #DivTablaClientes {
+            width: 80%;
+            /*padding-left: 10px;
+            padding-right: 10px;*/
+            display: flex;
+            justify-content: center; /* Alineación horizontal */
+            align-items: center; /* Alineación vertical */
+        }
 
-    /* Estilo para las filas marcadas con la clase 'seleccionada' */
-    .seleccionada {
-        background-color: lime !important;
-    }
+        .popup {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #4CAF50; /* Fondo verde */
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px; /* Esquinas redondeadas */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
 
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+
+        /* Estilo para las celdas de encabezado th */
+        th {
+            background-color: #333; /* Color de fondo para las celdas de encabezado */
+            color: white; /* Color de texto para las celdas de encabezado */
+            padding: 5px; /* Espaciado interno */
+            text-align: center; /* Alineación del texto a la izquierda */
+            border-radius: 5px; /* Bordes redondeados */
+        }
+
+        /* Estilo para las filas pares */
+        tr:nth-child(even) {
+            background-color: #f2f2f2; /* Color de fondo para filas pares */
+        }
+
+        /* Estilo para las filas impares */
+        tr:nth-child(odd) {
+            background-color: #ffffff; /* Color de fondo para filas impares */
+        }
+
+        /* Resaltado de la linea seleccionada */
+        #tablaListaReproduccion tr:hover {
+            background-color: yellow; /* Cambia el color de fondo a amarillo cuando se pasa el mouse */
+        }
+
+        /* Estilo para las celdas de datos td */
+        td {
+            padding: 5px; /* Espaciado interno */
+            text-align: left; /* Alineación del texto a la izquierda */
+            border-radius: 5px; /* Bordes redondeados */
+            border: 1px solid #ddd; /* Borde con color de fondo */
+        }
+
+        /* Estilo para las filas marcadas con la clase 'seleccionada' */
+        .seleccionada {
+            background-color: lime !important;
+        }
+
+        .seleccionada button {
+            background-color: gray; /* Cambia el color de fondo de los botones en filas seleccionadas */
+            color: white; /* Cambia el color del texto de los botones en filas seleccionadas */
+            cursor: not-allowed; /* Cambia el cursor del mouse a "no permitido" en filas seleccionadas */
+        }
+
+        .controlesReproduccion {
+            display: flex;
+            justify-content: flex-start; /* Alinea a la izquierda horizontalmente */
+            align-items: flex-start; /* Alinea arriba verticalmente */
+            margin: 10px; /* Agrega un pequeño margen alrededor del contenedor */
+            font-size: 10px;
+        }
+
+        /* Estilos para el pie de página */
+        .detalleActualizacion {
+            position: fixed; /* Fija la posición del elemento */
+            bottom: 0; /* Lo coloca en la parte inferior */
+            right: 0; /* Lo coloca en la parte derecha */
+            background-color: #f2f2f2; /* Color de fondo */
+            padding: 5px 10px;/* Espaciado interno */
+            border-top: 1px solid #ddd; /* Borde superior */
+            border-left: 1px solid #ddd; /* Borde izquierdo */
+            font-size: 10px;
+        }
+        table.clientes{
+            padding: 100px;
+        }
     
     </style>
 </head>
 <body>
     <h1>Servidor:</h1>
-    <div class="controlesReproduccion">
-
+    <div class="controlesReproduccion" style="background-color:#d70865">
+        <span id="reproduciendo">Reproduciendo: </span>
     </div>
-    <div class="anadir">
+    <div class="anadir" style="background-color: #1d08d7">
         Añadir Enlace: <input type="text" id="url" size="100" placeholder="https://www.youtube.com/watch?v=wMye9FkQEfo"><button id="enviar">Enviar</button>
-        <div id="popup" class="popup">
+        <div id="popup" class="popup" style="background-color:rgb(18, 201, 198)">
             <!-- Contenido del mensaje emergente -->
             URL agreada!!
         </div>
     </div>
     <br>
-    <div id="listaDeReproduccion">
-        <table id="tablaListaReproduccion">
-            <thead>
-                <tr>
-                    <th>Archivo</th>
-                    <th>Accion</th>
-                    <th>Destalle</th>
-                </tr>
-            </thead>
-            <tbody id="tabla-body">
-                <!-- Aquí se agregarán las filas dinámicamente -->
-            </tbody>
-        </table>
-        
-    </div>
+    <div class="contenido">
+        <div id="listaDeReproduccion" style="background-color: #d79208">
+            <table id="tablaListaReproduccion">
+                <thead>
+                    <tr>
+                        <th>Archivo</th>
+                        <th>Accion</th>
+                        <th>Destalle</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-body">
+                    <!-- Aquí se agregarán las filas dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+        <div id="Controles" style="background-color: #04f043">
+            <div id="DivTablaClientes">
+                <table class="clientes">
+                    <thead>
+                        <tr><th>Clientes:</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="DivControlesReproduccion">
+                <table>
+                    <tr><th colspan="4">Controles</th></tr>
+                    <tr><td><button>Anterior</button></td><td><button>Siguiente</button></td><td><button>Stop</button></td><td><button>Mute</button></td></tr>
+                </table>    
+                
+            </div>
+            <div id="DivMiniatura">
+                <table>
+                    <tr><th>Miniatura</th></tr>
+                    <tr><td><button>Aqui va la miniatura</button></td></tr>
+                </table>  
+            </div>
+        </div>
+    </div>    
     <div class="detalleActualizacion">
-        <span id="ultimaActualizacion"></span>
-        <span id="estadoCliente"></span>
+        <span id="ultimaActualizacion"></span> - <span id="estadoCliente"></span>
     </div>
     <script>
 
@@ -103,9 +202,9 @@
         let listaArchivos = [];
         let idSeleccionado = 0;
 
-        /* 
+        /******************************** 
         * ACTUALIZAR EL LISTADO
-        */
+        ********************************/
         function actualizarListado(){
             console.log("Actualizando el listado...");
             console.log("idSeleccionado; "+ idSeleccionado);
@@ -133,8 +232,8 @@
                     fila.innerHTML = `
                         <td>${nombreArchivo}</td>
                         <td>
-                            <button onclick="reproducirVideo(this)">Reproducir</button>
-                            <button onclick="borrarVideo('${nombreArchivo}', this)">Borrar</button>
+                            <button id="reproducir-${index}" onclick="reproducirVideo(this)">Reproducir</button>
+                            <button id="borrar-${index}" onclick="borrarVideo('${nombreArchivo}', this)">Borrar</button>
                         </td>
                         <td>${nombreArchivo}</td>
                     `;
@@ -147,6 +246,10 @@
                     filaValorActualizar.style.backgroundColor = "lime";
                     filaValorActualizar.classList.add('seleccionado')
                     console.log("/listar_archivos - valor de filaValorActualizar:" + filaValorActualizar);
+                    const botonBorrar = filaValorActualizar.querySelector('button:nth-child(2)'); // Suponiendo que el botón de "Borrar" es el segundo botón en la fila
+                    if (botonBorrar) {
+                        botonBorrar.disabled = true;
+                    }
                 }
             })
             .catch(error => {
@@ -158,9 +261,9 @@
             etiquetaUpdate.innerHTML = "<p>Ultima actualizacion: " + formatoFechaHora + "</p>";
         }
 
-        //***************************************************************
+        //******************************
         //         MOSTRAR POPUP
-        //***************************************************************
+        //******************************
         function mostrarPopup(mensaje) {
             var popup = document.getElementById("popup");
             popup.innerText = mensaje;
@@ -172,10 +275,9 @@
             }, 1500); // 3000 milisegundos = 3 segundos
         }
 
-
-        //***************************************************************
-        //         ENVIAR DATOS PARA DESCARGAR VIDEO DE URL
-        //***************************************************************
+        //*******************************
+        //ENVIAR DATOS PARA DESCARGAR VIDEO DE URL
+        //*******************************
         function enviarDatos() {
             var host = window.location.host;
             var endpoint = '/urlDownloader';
@@ -211,6 +313,9 @@
             });
         }
 
+        /******************************** 
+        * registrarCliente()
+        ********************************/
         function registrarCliente(){
             console.log("Cliente Alive send")
             fetch('/addCliente', {
@@ -226,6 +331,9 @@
             });
         }
 
+        /******************************** 
+        * reproducirVideo()
+        ********************************/
         function reproducirVideo(button) {
 
             // Limpio todas las classes seleccionada
@@ -241,6 +349,7 @@
                     filaValorActualizar.style.backgroundColor = "";
                     //filaValorActualizar.classList.add('seleccionado')
                     //console.log("/listar_archivos - valor de filaValorActualizar:" + filaValorActualizar);
+                    filaValorActualizar.querySelector('button:nth-child(2)').disabled = false
                 }
 
             // Obtener la fila seleccionada
@@ -296,9 +405,24 @@
                 idSeleccionado = idFila
                 console.log("Elemento (en reproducir) idSeleccionado: " + idSeleccionado);
                 console.log("Lista: " + listaArchivos);
+
+                // Actualizar el detalle de Reproduciendo
+                spanReproduciendo = document.getElementById("reproduciendo")
+                spanReproduciendo.innerHTML="Reproduciendo: "+ archivoSeleccionado.nombre;
+
+                // Deshabilitar el botón de "Borrar"
+                //
+                const idBotonBorrar = `borrar-${idSeleccionado-1}`;
+                const botonBorrar = document.getElementById(idBotonBorrar);
+                if (botonBorrar) {
+                    botonBorrar.disabled = true;
+                }
             }
         }
 
+        /******************************** 
+        * borrarVideo()
+        ********************************/
         function borrarVideo(idVideo) {
             console.log(`Borrar video con ID: ${idVideo}`);
             // Aquí puedes agregar el código para borrar el video según el ID proporcionado

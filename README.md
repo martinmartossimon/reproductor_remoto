@@ -8,3 +8,4 @@ Los videos son reproucidos (y almacenados) desde el propio host de la aplicació
 - Lista de Clientes conectados.
 - Lista de Reproducción: Reproduciendo actualmente
 - Archivar videos (a otra ubicación)
+- Agregar miniaturas de los videos
