@@ -15,8 +15,8 @@ import datetime
 
 directorio = "./contenido"
 mensajes = []
-clientes = []
-clientes_eventos = []
+clientes_eventos = [] #Lista de objetos EventosHandler
+clientes = [] #Lista strings de IP de clientes
 
 
 def listar_archivos():
@@ -128,13 +128,15 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         elif self.path == '/addCliente':
             # Obtiene la dirección IP del remitente
             client_ip = self.client_address[0]
-            print("IP del remitente recibida en /addCliente:", client_ip)
+            print("IP del remitente recibida en /addCliente:", client_ip, " tipo de dato que es cliente_ip: ", type(client_ip))
+            print("Tipo de dato de cliente_ip que inserto en cliente_eventos: ", type(client_ip))
             if client_ip not in clientes:
                     clientes.append(client_ip)
-                    print("Nueva IP agregada a la lista:", client_ip, " Lista -> ", str(clientes))
+                    #clientes_eventos.append(client_ip)
+                    print("Nueva IP agregada a la lista:", client_ip, " Lista de strings de Clientes: -> ", str(clientes))
             
             # Prepara la respuesta JSON
-            response_data = {"estado": "Alive"}
+            response_data = {"estado": "Conectado"}
             response_json = json.dumps(response_data)
             # Envia la respuesta
             self.send_response(200)
@@ -228,7 +230,9 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 # Clase para manejar las conexiones de eventos
 class EventosHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        # Servicio para el intercambio de mensajes con los clientes
         if self.path == '/eventos':
+            print("Llamada a /eventos - Contenido de clientes eventos: ", clientes_eventos)
             # Obtén la dirección IP de la interfaz en la que se está escuchando
             server_ip = socket.gethostbyname(socket.gethostname())
 
@@ -241,7 +245,7 @@ class EventosHandler(BaseHTTPRequestHandler):
             
             # Agregar el cliente a la lista de clientes
             clientes_eventos.append(self)
-
+            print("********* Tamano de la cola cliente_eventos", len(clientes_eventos))
             # Mantener la conexión abierta
             try:
                 while True:
@@ -253,6 +257,7 @@ class EventosHandler(BaseHTTPRequestHandler):
                         # Envía el mensaje a todos los clientes de eventos
                         for cliente in clientes_eventos:
                             try:
+                                print("Mensaje de reproduccion enviado a cliente: ", cliente)
                                 cliente.wfile.write(mensaje.encode('utf-8'))
                             except Exception as e:
                                 print("Error al enviar mensaje al cliente:", str(e))
@@ -266,17 +271,30 @@ class EventosHandler(BaseHTTPRequestHandler):
                 # Elimina al cliente de la lista cuando se desconecta
                 clientes_eventos.remove(self)
 
+        # Servicio que envía un JSON con el listado de clientes
+        elif self.path == '/getClientes':
+            # Obtén la dirección IP de la interfaz en la que se está escuchando
+            server_ip = socket.gethostbyname(socket.gethostname())
 
-#def iniciar_servidor():
-#    PORT = 8000
-#    with http.server.ThreadingHTTPServer(("", PORT), RequestHandler) as httpd:
-#        print(f"Servidor en el puerto {PORT}")
-#        httpd.serve_forever()
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Cache-Control', 'no-cache')
+            self.send_header('Connection', 'keep-alive')
+            self.send_header('Access-Control-Allow-Origin', f'http://{server_ip}:8000')  # Reemplaza 8000 por el puerto adecuado
+            self.end_headers()
+            
+            # Filtra las direcciones IP válidas y las convierte en JSON
 
-#if __name__ == "__main__":
-    # Iniciar el servidor en un hilo separado
-#    servidor_thread = threading.Thread(target=iniciar_servidor)
-#    servidor_thread.start()
+            for cliente in clientes
+
+            clientes_copy = [ip for ip in clientes_eventos if isinstance(ip, str)]
+            
+            clientes_json = json.dumps(clientes_copy)
+
+            # Imprimir el contenido del JSON en la salida del servidor
+            print("JSON generado en /getClientes:", clientes_json)
+
+            self.wfile.write(clientes_json.encode('utf-8'))
 
 def iniciar_servidores():
     PORT = 8000

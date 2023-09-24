@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visor</title>
+    <title id="titulo">Visor</title>
     <style>
         body {
             margin: 0;
@@ -61,6 +61,26 @@
             }
         };
 
+        /******************************** 
+        * registrarCliente()
+        * Esta funcion es candidata a deshabilitar. Es obsoleta
+        ********************************/
+        function registrarCliente(){
+            console.log("Cliente Alive send")
+            fetch('/addCliente', {
+                method: 'GET', // Puedes ajustar el método según tu API
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Actualiza el contenido en el elemento con ID "resultado"
+                document.getElementById('titulo').innerHTML = "Visor - Conectado";
+            })
+            .catch(error => {
+                console.error('Error al consultar el endpoint:', error);
+                document.getElementById('titulo').innerHTML = "Visor - Desconectado";
+            });
+        }
+
         function reproducirVideo(videoNombre) {
             // Aquí debes escribir la lógica para reproducir el video
             // Puedes utilizar un reproductor de video HTML5, como el siguiente ejemplo:
@@ -69,6 +89,10 @@
             videoPlayer.load(); // Carga el video
             videoPlayer.play(); // Reproduce el video
         }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            setInterval(registrarCliente, 5000);
+        });
     </script>
 </body>
 </html>

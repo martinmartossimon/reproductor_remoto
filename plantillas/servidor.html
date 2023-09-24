@@ -167,7 +167,7 @@
         </div>
         <div id="Controles" style="background-color: #04f043">
             <div id="DivTablaClientes">
-                <table class="clientes">
+                <table class="clientes" id="tablaClientes">
                     <thead>
                         <tr><th>Clientes:</th></tr>
                     </thead>
@@ -315,6 +315,8 @@
 
         /******************************** 
         * registrarCliente()
+        * 
+        * Deshabilitado desde esta vista ya que no es cliente
         ********************************/
         function registrarCliente(){
             console.log("Cliente Alive send")
@@ -428,6 +430,47 @@
             // Aquí puedes agregar el código para borrar el video según el ID proporcionado
         }
         
+        // Función para cargar la lista de clientes desde el servidor
+        function cargarClientes() {
+            console.log("ejecuto cargarClientes()");
+            // Obtén la dirección IP del host
+            const hostIP = window.location.hostname;
+            // Construye la URL completa del endpoint '/getClientes' con la dirección IP y el puerto 8001
+            const url = `http://${hostIP}:8001/getClientes`;
+
+            // Realiza una solicitud Fetch para obtener la lista de clientes
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Supongamos que data es un arreglo de nombres de clientes
+                    const clientesEventos = data;
+                    console.log("Data Recibida despues del fetch: " + data);
+
+                    // Obtén la tabla por su id
+                    const tablaClientes = document.getElementById("tablaClientes");
+
+                    // Verifica si la tabla existe
+                    if (tablaClientes) {
+                        // Elimina la fila "Cargando..."
+                        tablaClientes.deleteRow(0);
+
+                        // Agrega una fila por cada cliente
+                        for (const cliente of clientesEventos) {
+                            const row = tablaClientes.insertRow();
+                            const cell = row.insertCell();
+                            cell.textContent = cliente;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al obtener la lista de clientes:", error);
+                });
+        }
 
         /* 
         * Listeners 
@@ -435,9 +478,10 @@
         document.getElementById('enviar').addEventListener('click', enviarDatos);
         document.addEventListener("DOMContentLoaded", function() {
             setInterval(actualizarListado, 15000); // 5000 milisegundos = 5 segundos
+            setInterval(cargarClientes, 5000); // 5000 milisegundos = 5 segundos
             //setInterval(registrarCliente, 2000);
             actualizarListado();
-            registrarCliente();
+            //registrarCliente();
         });
     </script>
 </body>
