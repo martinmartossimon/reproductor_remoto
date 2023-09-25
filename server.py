@@ -14,7 +14,7 @@ import datetime
 
 
 directorio = "./contenido"
-mensajes = []
+mensajes = [] # [{'accion': 'reproducir', 'video': 'FalsaPROPAGANDA.mp4', 'fecha': '2023-09-25 01:05:30'}]
 clientes_eventos = [] #Lista de objetos EventosHandler
 clientes = [] #Lista strings de IP de clientes
 
@@ -121,7 +121,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 print(f"Se produjo un error de conexión: {e}")
                 # Imprime un mensaje personalizado
                 print("La conexión se restableció abruptamente por el cliente por cambio de video.")
-        # Listar Videos
+        # Listar Videos: Envia algo así: ["13COMANDOSRAROS.mp4", "ConcordeJustKis.mp4", "T10x4Debatokere.mp4"]
         elif self.path == '/listar_archivos':
             archivos = listar_archivos()
             if isinstance(archivos, list):
@@ -129,18 +129,15 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
                 response_data = json.dumps(archivos)
+                #print("JSON de /listar_archivos: ", response_data)
                 self.wfile.write(response_data.encode())
-        # Anadir Cliente
+        # Anadir Cliente. Envia el siguiente json: {"estado": "Conectado"}
         elif self.path == '/addCliente':
             # Obtiene la dirección IP del remitente
             client_ip = self.client_address[0]
-            print("IP del remitente recibida en /addCliente:", client_ip, " tipo de dato que es cliente_ip: ", type(client_ip))
-            print("Tipo de dato de cliente_ip que inserto en cliente_eventos: ", type(client_ip))
             if client_ip not in clientes:
-                    clientes.append(client_ip)
-                    #clientes_eventos.append(client_ip)
-                    print("Nueva IP agregada a la lista:", client_ip, " Lista de strings de Clientes: -> ", str(clientes))
-            
+                clientes.append(client_ip)
+                print("Nueva IP agregada a la lista clientes desde  /addCliente:", client_ip, " Lista de strings de Clientes: -> ", str(clientes))
             # Prepara la respuesta JSON
             response_data = {"estado": "Conectado"}
             response_json = json.dumps(response_data)
@@ -149,7 +146,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(response_json.encode()) 
-        # Servicio que envía un JSON con el listado de clientes
+        # Servicio que envía un JSON con el listado de clientes: [{"cliente": "192.168.18.101"}, {"cliente": "192.168.18.151"}]
         elif self.path == '/getClientes':
             # Retorna algo en este formato: [{"cliente": "192.168.18.101"}, {"cliente": "192.168.18.112"}]
             # Obtén la dirección IP de la interfaz en la que se está escuchando
@@ -174,41 +171,28 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write("Endpoint no encontrado".encode())
 
     def do_POST(self):
+        # Endpoint que descarga videos de youtube. Recive un JSON como el siguiente: {"url":"https://www.youtube.com/watch?v=2MjgGqOXA5s"}
         if self.path == '/urlDownloader':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            print("Tipo de post_data: " + str(type(post_data)))
-            print("Tipo de dato de json.loads(post_data.decode()): " + str(type(json.loads(post_data.decode()))))
             try:
-                #Esta linea se puede borrar, asi lo lee originalmente
-                diccionario = json.loads(post_data.decode())
-                #diccionario = json.loads(post_data)
-        
+                diccionario = json.loads(post_data.decode())        
                 # Actualizar los datos con los recibidos en la solicitud POST
-                #data.update(post_data)
-                print("diccionario: " + str(diccionario) + " tipo de dato: " + str(type(diccionario)))
                 url = diccionario["url"]
-                print("Datos recibidos en la post: " + post_data.decode())
-                print("Datos recibidos en la llamada: " + url)
-                print("Ahora llamaría al descargador, si fuese posible en un hilo aparte")
                 self.send_response(200)
                 self.send_header('Content-type', 'text/plain')
                 self.end_headers()
 
-                print("Ejecutando el proceso de descarga")
                 descargarVideoYoutube(url)
 
-                #self.wfile.write(post_data.encode())
                 self.wfile.write(post_data)
-                #self.wfile.write("URL Recivida!! " + str(post_data))
-                #self.wfile.write("Servidor")
 
             except json.JSONDecodeError:
                 self.send_response(400)  # Devuelve un código de respuesta 400 si los datos no son JSON válidos
                 self.send_header('Content-type', 'text/plain')
                 self.end_headers()
                 self.wfile.write("Datos JSON no válidos".encode())
-        # Funcion para reproducir el video en los clientes
+        # Funcion para reproducir el video en los clientes. Recive un JSON: {"accion":"reproducir","video":"Estoseveentiend.mp4"}
         elif self.path == '/reproducirVideo':
             content_length = int(self.headers['Content-Length'])
             data = self.rfile.read(content_length)
@@ -217,21 +201,14 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             video = data.get('video')
 
             if accion == 'reproducir':
-                # Llama a la función para reproducir el video en los clientes registrados
-                #reproducir_video(video)
-                #Aqui vendria la accion de añadirlo a la cola de eventos
-                print("Llamo a reproducir video con video: " + video)
                 # Obtener la fecha y hora actual
                 fecha_actual = datetime.datetime.now()
                 # Formatear la fecha y hora como una cadena
                 fecha_actual_str = fecha_actual.strftime("%Y-%m-%d %H:%M:%S")
                 # Le añado el campo fecha al json
                 data["fecha"] = fecha_actual_str
-
-                # Agrego a la lista el mensaje
+                # Agrego a la lista el mensaje: [{'accion': 'reproducir', 'video': 'FalsaPROPAGANDA.mp4', 'fecha': '2023-09-25 01:05:30'}]
                 mensajes.append(data)
-
-                print("Contenido de la lista mensajes: " + str(mensajes))
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
@@ -243,7 +220,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps({"mensaje": "Accion no reconocida"}).encode('utf-8'))
                 return
-        # Funcion para borrar un video del listado de videos
+        # Funcion para borrar un video del listado de videos. Recive: {'nombre_video': 'FalsaPROPAGANDA.mp4'} - Retorna: {mensaje: 'Video eliminado correctamente'}
         elif self.path == '/borrarVideo':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -261,7 +238,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                     if os.path.isfile(video_path):
                         # Elimina el video
                         os.remove(video_path)
-                        print("Archivo Borrado: ", video_path)
+                        print("!! - Archivo Borrado: ", video_path)
                         self.send_response(200)
                         self.send_header('Content-type', 'application/json')
                         self.end_headers()
@@ -308,8 +285,11 @@ class EventosHandler(BaseHTTPRequestHandler):
             self.end_headers()
             
             # Agregar el cliente a la lista de clientes
-            clientes_eventos.append(self)
-            print("********* Tamano de la cola cliente_eventos", len(clientes_eventos))
+            if self not in clientes_eventos:
+                print("!!!!!!!! Agrego cliente nuevo porque no existia")
+                clientes_eventos.append(self)
+            print("No agrego ya que el cliente existia previamente")
+            #print("********* Tamano de la cola cliente_eventos", len(clientes_eventos))
             # Mantener la conexión abierta
             try:
                 while True:
