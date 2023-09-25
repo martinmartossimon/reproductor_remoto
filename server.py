@@ -28,6 +28,37 @@ def listar_archivos():
     except Exception as e:
         return str(e)
 
+# Genera un JSON similar a: [{"archivo": "DEMONSCRESTSUPE.mp4", "tamano": "91.84 MB", "Fecha_Creacion": "25/09/2023 00:54"}, {"archivo": "Informativomati.mp4", "tamano": "7.17 MB", "Fecha_Creacion": "25/09/2023 09:43"}]
+def listar_archivos_detalle(): 
+    try:
+        archivos = [nombre for nombre in os.listdir(directorio) if nombre.endswith('.mp4')]
+        archivos_con_info = []
+
+        for nombre_archivo in archivos:
+            archivo_info = {}
+            ruta_completa = os.path.join(directorio, nombre_archivo)
+
+            # Obtener el tamaño del archivo en MB o GB
+            tamano = os.path.getsize(ruta_completa)
+            if tamano >= 1024 ** 3:  # Si es mayor o igual a 1 GB
+                tamano_str = f"{tamano / (1024 ** 3):.2f} GB"
+            else:
+                tamano_str = f"{tamano / (1024 ** 2):.2f} MB"
+
+            # Obtener la fecha de creación en el formato deseado
+            fecha_creacion_timestamp = os.path.getctime(ruta_completa)
+            fecha_creacion = datetime.datetime.fromtimestamp(fecha_creacion_timestamp).strftime('%d/%m/%Y %H:%M')
+
+            archivo_info['archivo'] = nombre_archivo
+            archivo_info['tamano'] = tamano_str
+            archivo_info['Fecha_Creacion'] = fecha_creacion
+
+            archivos_con_info.append(archivo_info)
+
+        return json.dumps(archivos_con_info, ensure_ascii=False)
+    except Exception as e:
+        return str(e)
+
 def descargarVideoYoutube(url):
     urlLimpia = urllib.parse.unquote(url)
     script_path = os.path.abspath('/home/tincho/Scripts/reproductor_remoto/descargadorYtb-dlp')
@@ -148,6 +179,15 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 response_data = json.dumps(archivos)
                 #print("JSON de /listar_archivos: ", response_data)
                 self.wfile.write(response_data.encode())
+        # Genera un JSON con el siguiente detalle: [{"archivo": "DEMONSCRESTSUPE.mp4", "tamano": "91.84 MB", "Fecha_Creacion": "25/09/2023 00:54"}, {"archivo": "Informativomati.mp4", "tamano": "7.17 MB", "Fecha_Creacion": "25/09/2023 09:43"}]
+        elif self.path == '/listar_archivos_detalle':
+            resultado_json = listar_archivos_detalle()         
+            print("Tipo de dato de resultado_json: ", type(resultado_json))
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            print("Enviando JSON: ", resultado_json.encode())
+            self.wfile.write(resultado_json.encode())
         # Anadir Cliente. Envia el siguiente json: {"estado": "Conectado"}
         elif self.path == '/addCliente':
             # Obtiene la dirección IP del remitente
