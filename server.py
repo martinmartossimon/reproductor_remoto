@@ -40,6 +40,23 @@ def descargarVideoYoutube(url):
     except FileNotFoundError:
         print("No se encontró el archivo del script.")
 
+# Manda mensaje a viewers: {"fecha": "2023-09-25 02:37:23", "accion": "Ping"}
+def queryClientesAlive():
+    data = {}
+    # Obtener la fecha y hora actual
+    fecha_actual = datetime.datetime.now()
+    # Formatear la fecha y hora como una cadena
+    fecha_actual_str = fecha_actual.strftime("%Y-%m-%d %H:%M:%S")
+    # Le añado el campo fecha al json
+    data["fecha"] = fecha_actual_str
+    data["accion"] = "Ping"
+    mensajes.append(data)
+    print("PING!!")
+    for cliente in clientes:
+        print("Cliente - ", cliente)
+    for cliente_E in clientes_eventos:
+        print("Cliente_E - ", cliente_E)
+
 
 # Definir el manejador de solicitudes personalizado
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -276,6 +293,7 @@ class EventosHandler(BaseHTTPRequestHandler):
             print("Llamada a /eventos - Contenido de clientes eventos: ", clientes_eventos)
             # Obtén la dirección IP de la interfaz en la que se está escuchando
             server_ip = socket.gethostbyname(socket.gethostname())
+            client_ip = self.client_address[0]
 
             self.send_response(200)
             self.send_header('Content-Type', 'text/event-stream')
@@ -286,12 +304,10 @@ class EventosHandler(BaseHTTPRequestHandler):
             
             # Agregar el cliente a la lista de clientes
             if self not in clientes_eventos:
-                print("!!!!!!!! Agrego cliente nuevo porque no existia")
+                print("!!!!!!!! Agrego cliente nuevo porque no existia: ", str(client_ip))
                 clientes_eventos.append(self)
-            print("No agrego ya que el cliente existia previamente")
-            #print("********* Tamano de la cola cliente_eventos", len(clientes_eventos))
-            # Mantener la conexión abierta
-            try:
+            print("No agrego ya que el cliente existia previamente: ", str(client_ip))
+            try: # Mantener la conexión abierta
                 while True:
                     # Envía eventos a todos los clientes de eventos
                     if mensajes:
@@ -307,8 +323,7 @@ class EventosHandler(BaseHTTPRequestHandler):
                                 print("Error al enviar mensaje al cliente:", str(e))
                                 # Elimina al cliente si hay un error
                                 clientes_eventos.remove(cliente)
-                                client_ip = self.client_address[0]
-                                print("********************Cliente desconectado: ", str(client_ip))
+                                print("********************Cliente desconectado - Borrando de clientes tambien: ", str(client_ip))
                                 clientes.remove(client_ip)
                     
                     # Simula un intervalo de tiempo (ajusta según tus necesidades)
@@ -316,7 +331,13 @@ class EventosHandler(BaseHTTPRequestHandler):
             except Exception as e:
                 print("********************Cliente desconectado:", str(e))
                 # Elimina al cliente de la lista cuando se desconecta
-                clientes_eventos.remove(self)        
+                clientes_eventos.remove(self)
+                clientes.remove(client_ip)       
+
+def ping_clientes():
+    while True:
+        queryClientesAlive()
+        time.sleep(10)
 
 def iniciar_servidores():
     PORT = 8000
@@ -329,6 +350,9 @@ def iniciar_servidores():
         eventos_server = ThreadingHTTPServer(("", eventos_port), EventosHandler)
         eventos_thread = threading.Thread(target=eventos_server.serve_forever)
         eventos_thread.start()
+
+        hilo_ping_clientes = threading.Thread(target=ping_clientes)
+        hilo_ping_clientes.start()
         
         # Iniciar el servidor web
         httpd.serve_forever()
