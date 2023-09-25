@@ -58,10 +58,14 @@ def obtener_duracion_video(ruta_archivo):
 # Genera un JSON similar a: [{"archivo": "DEMONSCRESTSUPE.mp4", "tamano": "91.84 MB", "Fecha_Creacion": "25/09/2023 00:54"}, {"archivo": "Informativomati.mp4", "tamano": "7.17 MB", "Fecha_Creacion": "25/09/2023 09:43"}]
 def listar_archivos_detalle(): 
     try:
+        # archivos = [nombre for nombre in os.listdir(directorio) if nombre.endswith('.mp4')]
         archivos = [nombre for nombre in os.listdir(directorio) if nombre.endswith('.mp4')]
+        # Ordeno por fecha de modificacion
+        archivos_ordenados = sorted(archivos, key=lambda x: os.path.getctime(os.path.join(directorio, x)))
         archivos_con_info = []
 
-        for nombre_archivo in archivos:
+        #for nombre_archivo in archivos:
+        for nombre_archivo in archivos_ordenados:
             archivo_info = {}
             ruta_completa = os.path.join(directorio, nombre_archivo)
 

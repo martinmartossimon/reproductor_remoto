@@ -18,7 +18,7 @@
         body {
             background-color: #fff;
             position: relative; /* Permite que el contenido fluya bajo el botón */
-            padding: 20px; /* Agrega margen para evitar la superposición del contenido */
+            /*padding: 1px; /* Agrega margen para evitar la superposición del contenido */
         }
 
         body.dark-theme {
@@ -202,8 +202,8 @@
         /* Estilo del contenedor del botón */
         #tema {
             position: absolute;
-            top: 10px; /* Ajusta la distancia desde la parte superior */
-            right: 10px; /* Ajusta la distancia desde la derecha */
+            top: 1px; /* Ajusta la distancia desde la parte superior */
+            right: 1px; /* Ajusta la distancia desde la derecha */
             z-index: 999; /* Asegura que esté por encima del contenido */
         }
         /* Estilos para tema oscuro en las tablas */
@@ -242,7 +242,6 @@
 </head>
 <body>
     <h1>Servidor:</h1>
-    <div id="tema"><button id="toggleButton" class="button-with-icon"><span>&#x1F4A1; Apagar</span></button></div>
     <div class="controlesReproduccion">
         <span id="reproduciendo">Reproduciendo: </span>
     </div>
@@ -302,6 +301,7 @@
     <div class="detalleActualizacion">
         <span id="ultimaActualizacion"></span> - <span id="estadoCliente"></span>
     </div>
+    <div id="tema"><button id="toggleButton" class="button-with-icon"><span>&#x1F4A1; Apagar</span></button></div>
     <script>
 
         // Variables Globales
