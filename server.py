@@ -166,6 +166,22 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 pathBuscado='Archivo no encontrado en: .' + template_path + "cliente.html"
                 self.wfile.write(pathBuscado.encode())
+        # Endpoint de js
+        elif self.path == '/reproductor.js':
+            try:
+                # Abre el archivo JavaScript solicitado en modo lectura binaria
+                with open('.' + template_path + self.path, 'rb') as file:
+                    content = file.read()
+                self.send_response(200)
+                self.send_header('Content-type', 'application/javascript')
+                self.end_headers()
+                self.wfile.write(content)
+            except FileNotFoundError:
+                self.send_response(404)
+                self.send_header('Content-type', 'text/plain')
+                self.end_headers()
+                pathBuscado = 'Archivo no encontrado en: .' + template_path + "/ruta/al/archivo.js"
+                self.wfile.write(pathBuscado.encode())
         # Endpoint de url del visor
         elif self.path == '/viewer':
             try:
