@@ -287,6 +287,19 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
 # Clase para manejar las conexiones de eventos
 class EventosHandler(BaseHTTPRequestHandler):
+    # Inicializo la propiedad ip
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ip = self.client_address[0]
+        # Agrega la IP del cliente a la lista global 'clientes'
+        clientes.append(self.ip)
+    
+    # Destructor: Borra el cliente de clientes[]
+    def __del__(self):
+        # Elimina la IP del cliente de la lista global 'clientes' cuando se destruye el objeto
+        if self.ip in clientes:
+            clientes.remove(self.ip)
+
     def do_GET(self):
         # Servicio para el intercambio de mensajes con los clientes
         if self.path == '/eventos':
@@ -317,22 +330,22 @@ class EventosHandler(BaseHTTPRequestHandler):
                         # Envía el mensaje a todos los clientes de eventos
                         for cliente in clientes_eventos:
                             try:
-                                print("Mensaje de reproduccion enviado a cliente: ", cliente)
+                                print("Mensaje de reproduccion enviado a cliente: ", str(cliente.client_address[0]))
                                 cliente.wfile.write(mensaje.encode('utf-8'))
                             except Exception as e:
                                 print("Error al enviar mensaje al cliente:", str(e))
                                 # Elimina al cliente si hay un error
                                 clientes_eventos.remove(cliente)
-                                print("********************Cliente desconectado - Borrando de clientes tambien: ", str(client_ip))
-                                clientes.remove(client_ip)
+                                print("********************Cliente desconectado - Borrando de clientes también: ", str(cliente.client_address[0]))
+                                clientes.remove(cliente.client_address[0])
                     
                     # Simula un intervalo de tiempo (ajusta según tus necesidades)
                     time.sleep(1)
             except Exception as e:
                 print("********************Cliente desconectado:", str(e))
                 # Elimina al cliente de la lista cuando se desconecta
-                clientes_eventos.remove(self)
-                clientes.remove(client_ip)       
+                clientes.remove(client_ip)
+                clientes_eventos.remove(self)       
 
 def ping_clientes():
     while True:
