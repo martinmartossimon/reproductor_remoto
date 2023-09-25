@@ -28,6 +28,33 @@ def listar_archivos():
     except Exception as e:
         return str(e)
 
+def obtener_duracion_video(ruta_archivo):
+    try:
+        # Utiliza el comando ffprobe para obtener la duración del video en segundos
+        resultado = subprocess.run(
+            ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", ruta_archivo],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True
+        )
+
+        if resultado.returncode == 0:
+            duracion_segundos = float(resultado.stdout.strip())
+
+            # Convierte la duración en segundos a horas, minutos y segundos
+            duracion_hora = int(duracion_segundos // 3600)
+            duracion_minuto = int((duracion_segundos % 3600) // 60)
+            duracion_segundo = int(duracion_segundos % 60)
+
+            return {
+                "segundos": duracion_segundos,
+                "duracion": f"{duracion_hora:02d}:{duracion_minuto:02d}:{duracion_segundo:02d}"
+            }
+        else:
+            return None
+    except Exception as e:
+        return None
+
 # Genera un JSON similar a: [{"archivo": "DEMONSCRESTSUPE.mp4", "tamano": "91.84 MB", "Fecha_Creacion": "25/09/2023 00:54"}, {"archivo": "Informativomati.mp4", "tamano": "7.17 MB", "Fecha_Creacion": "25/09/2023 09:43"}]
 def listar_archivos_detalle(): 
     try:
@@ -49,9 +76,15 @@ def listar_archivos_detalle():
             fecha_creacion_timestamp = os.path.getctime(ruta_completa)
             fecha_creacion = datetime.datetime.fromtimestamp(fecha_creacion_timestamp).strftime('%d/%m/%Y %H:%M')
 
+            # Obtener la duración del video
+            duracion = obtener_duracion_video(ruta_completa)
+
             archivo_info['archivo'] = nombre_archivo
             archivo_info['tamano'] = tamano_str
             archivo_info['Fecha_Creacion'] = fecha_creacion
+            # Agregar la duración en segundos y en formato h:m:s
+            archivo_info['duracion_segundos'] = duracion['segundos']
+            archivo_info['duracion_hms'] = duracion['duracion']
 
             archivos_con_info.append(archivo_info)
 
