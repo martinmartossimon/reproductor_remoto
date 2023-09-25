@@ -9,10 +9,36 @@
         .contenido {
             display: grid;
             grid-template-columns: 75% 25%; /* Divide en dos columnas, 75% y 25% */
-            background-color: #1369cc; /* Color de fondo de la fila */
-            border: 1px solid #ddd; /* Borde para separar las columnas */
+            /*background-color: #1369cc; /* Color de fondo de la fila */
+            /*border: 1px solid #ddd; /* Borde para separar las columnas */
+            /* ... Estilos para el tema claro ... */
+            /*background-color: #1369cc; /* Color de fondo de la fila */
+            /*border: 1px solid #ddd; /* Borde para separar las columnas */
+        }
+        body {
+            background-color: #fff;
+            position: relative; /* Permite que el contenido fluya bajo el botón */
+            padding: 20px; /* Agrega margen para evitar la superposición del contenido */
         }
 
+        body.dark-theme {
+            background-color: #000000;
+            color: rgb(251, 251, 251);
+        }
+
+        /* Estilos para tema oscuro */
+        body.dark-theme .contenido {
+            background-color: #333; /* Color de fondo de la fila en tema oscuro */
+            /*border: 1px solid #555; /* Borde para separar las columnas en tema oscuro */
+        }
+
+        /* Estilo para el pie de página en tema oscuro */
+        body.dark-theme .detalleActualizacion {
+            background-color: #111; /* Color de fondo en tema oscuro */
+            color: #fff; /* Color de texto en tema oscuro */
+            border-top: 1px solid #333; /* Borde superior en tema oscuro */
+            border-left: 1px solid #333; /* Borde izquierdo en tema oscuro */
+        }
  
         #listaDeReproduccion {
             display: flex;
@@ -25,7 +51,7 @@
 
         /* Estilos para la parte derecha (clientes) */
         #Controles {
-            background-color: #4CAF50;
+            /* background-color: #4CAF50; ]*/
             display: flex;
             flex-direction: column;
             align-items: center; /* Alinea al centro horizontalmente */
@@ -107,8 +133,8 @@
         }
 
         .seleccionada button {
-            background-color: gray; /* Cambia el color de fondo de los botones en filas seleccionadas */
-            color: white; /* Cambia el color del texto de los botones en filas seleccionadas */
+            /* background-color: gray;*/ /* Cambia el color de fondo de los botones en filas seleccionadas */
+            color: rgb(0, 0, 0); /* Cambia el color del texto de los botones en filas seleccionadas */
             cursor: not-allowed; /* Cambia el cursor del mouse a "no permitido" en filas seleccionadas */
         }
 
@@ -153,29 +179,93 @@
             background-color: #ffffff; /* Cambia el color de fondo para filas impares */
         }
     
+        /* Estilo base del botón con icono de bombilla */
+        .button-with-icon {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 5px;
+            background-color: #000000; /* Color de fondo del botón */
+            color: rgb(255, 255, 255); /* Color del texto del botón */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        /* Estilo del icono de bombilla */
+        .button-with-icon::before {
+            /*content: "\1F4A1"; /* Código del emoji de bombilla */
+            font-size: 10px; /* Tamaño del icono */
+            margin-right: 10px; /* Espacio entre el icono y el texto */
+        }
+
+        /* Estilo del contenedor del botón */
+        #tema {
+            position: absolute;
+            top: 10px; /* Ajusta la distancia desde la parte superior */
+            right: 10px; /* Ajusta la distancia desde la derecha */
+            z-index: 999; /* Asegura que esté por encima del contenido */
+        }
+        /* Estilos para tema oscuro en las tablas */
+        body.dark-theme table {
+            background-color: #333; /* Cambia el fondo de las tablas en tema oscuro */
+            border: 1px solid #555; /* Cambia el borde de las tablas en tema oscuro */
+            color: white; /* Cambia el color del texto en las tablas en tema oscuro */
+        }
+
+        /* Estilos para tema oscuro en las celdas de encabezado th de las tablas */
+        body.dark-theme table th {
+            background-color: #333; /* Cambia el fondo de las celdas de encabezado en tema oscuro */
+            color: white; /* Cambia el color del texto de las celdas de encabezado en tema oscuro */
+        }
+
+        /* Estilos para tema oscuro en las filas pares de las tablas */
+        body.dark-theme table tr:nth-child(even) {
+            background-color: #444; /* Cambia el fondo de las filas pares en tema oscuro */
+        }
+
+        /* Estilos para tema oscuro en las filas impares de las tablas */
+        body.dark-theme table tr:nth-child(odd) {
+            background-color: #333; /* Cambia el fondo de las filas impares en tema oscuro */
+        }
+
+        /* Resaltado de la línea seleccionada en las tablas en tema oscuro */
+        body.dark-theme table tr:hover {
+            background-color: #555; /* Cambia el fondo cuando se pasa el mouse en tema oscuro */
+        }
+
+        /* Estilos para tema oscuro en las celdas de datos td de las tablas */
+        body.dark-theme table td {
+            border: 1px solid #444; /* Cambia el borde de las celdas de datos en tema oscuro */
+        }
     </style>
 </head>
 <body>
     <h1>Servidor:</h1>
-    <div class="controlesReproduccion" style="background-color:#d70865">
+    <div id="tema"><button id="toggleButton" class="button-with-icon"><span>&#x1F4A1; Apagar</span></button></div>
+    <div class="controlesReproduccion">
         <span id="reproduciendo">Reproduciendo: </span>
     </div>
-    <div class="anadir" style="background-color: #1d08d7">
+    <div class="anadir">
         Añadir Enlace: <input type="text" id="url" size="100" placeholder="https://www.youtube.com/watch?v=wMye9FkQEfo"><button id="enviar">Enviar</button>
-        <div id="popup" class="popup" style="background-color:rgb(18, 201, 198)">
+        <div id="popup" class="popup" style="background-color:rgb(18, 201, 110)">
             <!-- Contenido del mensaje emergente -->
             URL agreada!!
         </div>
     </div>
     <br>
     <div class="contenido">
-        <div id="listaDeReproduccion" style="background-color: #d79208">
+        <div id="listaDeReproduccion">
             <table id="tablaListaReproduccion">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Archivo</th>
                         <th>Accion</th>
                         <th>Destalle</th>
+                        <th>Tamaño</th>
+                        <th>Fecha Creación</th>
+                        <th>Duración</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-body">
@@ -183,7 +273,7 @@
                 </tbody>
             </table>
         </div>
-        <div id="Controles" style="background-color: #04f043">
+        <div id="Controles">
             <div id="DivTablaClientes">
                 <table class="clientes" id="tablaClientes">
                     <thead>
@@ -220,8 +310,13 @@
         let listaArchivos = [];
         let idSeleccionado = 0;
 
+        const button = document.getElementById('toggleButton');
+        let darkModeEnabled = false;
+
+
         /******************************** 
         * ACTUALIZAR EL LISTADO
+        * Recibe JSON: ["13COMANDOSRAROS.mp4", "ConcordeJustKis.mp4", "T10x4Debatokere.mp4"]
         ********************************/
         function actualizarListado(){
             console.log("Actualizando el listado...");
@@ -279,6 +374,81 @@
             etiquetaUpdate.innerHTML = "<p>Ultima actualizacion: " + formatoFechaHora + "</p>";
         }
 
+        /******************************** 
+        * actualizarListado_Detalle()
+        ********************************/
+        function actualizarListado_Detalle() {
+            console.log("Actualizando el listado de detalles...");
+
+            fetch('/listar_archivos_detalle')
+                .then(response => response.json()) // Parsear la respuesta JSON
+                .then(data => {
+                    // Obtén la tabla existente
+                    const tablaReproduccion = document.getElementById('tablaListaReproduccion');
+                    const tbody = tablaReproduccion.querySelector('tbody');
+                    
+                    // Elimina las filas existentes en la tabla, excepto la primera (encabezado)
+                    //while (tbody.rows.length > 1) {
+                    //    tbody.deleteRow(1);
+                    //}
+                    // Limpia el contenido del cuerpo de la tabla
+                    tbody.innerHTML = '';
+
+                    // Reinicializar la lista de archivos
+                    listaArchivos = [];
+
+                    // Iterar sobre la lista de detalles y construir las filas
+                    data.forEach((detalle, index) => {
+                        const fila = document.createElement('tr');
+                        const id = index + 1;
+                        //fila.dataset.id = id;
+                        fila.dataset.id = index + 1;
+
+                        // Agregar detalles a la lista
+                        listaArchivos.push({ id, nombre: detalle.archivo });
+
+                        // Botones de Reproducción y Borrar
+                        const botones = document.createElement('td');
+                        botones.innerHTML = `
+                            <button id="reproducir-${id}" onclick="reproducirVideo(this)">&#x25B6;</button>
+                            <button id="borrar-${id}" onclick="borrarVideo('${detalle.archivo}', this)">&#x1F5D1;</button>
+                        `;
+
+                        fila.innerHTML = `
+                            <td>${id}</td>                       
+                            <td>${detalle.archivo}</td>
+                            ${botones.outerHTML}
+                            <td>${detalle.archivo}</td>
+                            <td>${detalle.tamano}</td>
+                            <td>${detalle.Fecha_Creacion}</td>
+                            <td>${detalle.duracion_hms}</td>
+                        `;
+
+                        tbody.appendChild(fila);
+
+                        // Pinto la fila de reproduciendo y deshabilito el boton
+                        const filaValorActualizar = tbody.querySelector(`tr[data-id="${idSeleccionado}"]`);
+                        if (filaValorActualizar) {
+                            filaValorActualizar.style.backgroundColor = "lime";
+                            filaValorActualizar.classList.add('seleccionado')
+                            console.log("/listar_archivos - valor de filaValorActualizar:" + filaValorActualizar);
+                            const botonBorrar = filaValorActualizar.querySelector('button:nth-child(2)'); // Suponiendo que el botón de "Borrar" es el segundo botón en la fila
+                            if (botonBorrar) {
+                                botonBorrar.disabled = true;
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al obtener la lista de detalles:', error);
+                });
+                const fechaHora = new Date(); // Obtiene la fecha y hora actual
+                const formatoFechaHora = fechaHora.toLocaleString(); // Convierte la fecha y hora a una cadena legible
+                etiquetaUpdate = document.getElementById("ultimaActualizacion");
+                etiquetaUpdate.innerHTML = "Ultima actualizacion: " + formatoFechaHora;
+        }
+        
+        
         //******************************
         //         MOSTRAR POPUP
         //******************************
@@ -431,7 +601,7 @@
 
                 // Deshabilitar el botón de "Borrar"
                 //
-                const idBotonBorrar = `borrar-${idSeleccionado-1}`;
+                const idBotonBorrar = `borrar-${idSeleccionado}`;
                 const botonBorrar = document.getElementById(idBotonBorrar);
                 if (botonBorrar) {
                     botonBorrar.disabled = true;
@@ -459,7 +629,8 @@
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                actualizarListado();
+                //actualizarListado();
+                actualizarListado_Detalle();
                 //boton.disabled = true;
                 //var fila = boton.closest('tr');
                 //if (fila) {
@@ -531,11 +702,49 @@
         */
         document.getElementById('enviar').addEventListener('click', enviarDatos);
         document.addEventListener("DOMContentLoaded", function() {
-            setInterval(actualizarListado, 15000); // 5000 milisegundos = 5 segundos
+            //setInterval(actualizarListado, 15000); // 5000 milisegundos = 5 segundos
+            setInterval(actualizarListado_Detalle, 15000); // 5000 milisegundos = 5 segundos
             setInterval(cargarClientes, 15000); // 5000 milisegundos = 5 segundos
             //setInterval(registrarCliente, 2000);
-            actualizarListado();
+            //actualizarListado();
+            actualizarListado_Detalle();
             //registrarCliente();
+        });
+        /*
+        * Listener de cambio de tema
+        */
+        button.addEventListener('click', () => {
+            darkModeEnabled = !darkModeEnabled; // Alternar entre temas oscuro y claro
+            const body = document.body;
+
+            if (darkModeEnabled) {
+                document.body.style.backgroundColor = '#333'; // Cambia el fondo a un color oscuro
+                document.body.style.color = '#fff'; // Cambia el color del texto a blanco
+
+                body.classList.add('dark-theme'); // Agregar la clase 'dark-theme' al cuerpo
+                console.log('Tema oscuro activado');
+                button.innerHTML = '<span>&#x1F4A1;</span> Encender';
+
+                // Aplicar tema oscuro a las tablas con identificadores específicos
+                const tables = document.querySelectorAll('#tablaListaReproduccion, #tablaClientes');
+                tables.forEach(table => {
+                    table.classList.add('dark-theme'); // Agregar clase 'dark-theme' a las tablas
+                });
+            } else {
+                document.body.style.backgroundColor = '#ffffff'; // Cambia el fondo a un color oscuro
+                document.body.style.color = '#000000'; // Cambia el color del texto a blanco
+
+                body.classList.remove('dark-theme'); // Eliminar la clase 'dark-theme' del cuerpo
+                console.log('Tema claro activado');
+                button.innerHTML = '<span>&#x1F4A1;</span> Apagar';
+                // Restaurar estilos anteriores del botón aquí si es necesario
+
+                // Restaurar tema claro en las tablas con identificadores específicos
+                const tables = document.querySelectorAll('#tablaListaReproduccion, #tablaClientes');
+                tables.forEach(table => {
+                    table.classList.remove('dark-theme'); // Eliminar clase 'dark-theme' de las tablas
+                });
+            }
         });
     </script>
 </body>
