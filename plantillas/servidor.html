@@ -430,44 +430,56 @@
             // Aquí puedes agregar el código para borrar el video según el ID proporcionado
         }
         
+        /******************************** 
+        * cargarClientes()
+        ********************************/
         // Función para cargar la lista de clientes desde el servidor
         function cargarClientes() {
             console.log("ejecuto cargarClientes()");
             // Obtén la dirección IP del host
             const hostIP = window.location.hostname;
             // Construye la URL completa del endpoint '/getClientes' con la dirección IP y el puerto 8001
-            const url = `http://${hostIP}:8001/getClientes`;
+            const url = `http://${hostIP}:8000/getClientes`;
+            console.log("Obteniendo listado de clientes de: " + url);
 
             // Realiza una solicitud Fetch para obtener la lista de clientes
             fetch(url)
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
-                    }
-                    return response.json();
+                    console.log("Entro al response: ");
+                    if (response.ok) {
+                            return response.json();
+                        } else {
+                            throw new Error('Error en la solicitud');
+                        }
                 })
                 .then(data => {
-                    // Supongamos que data es un arreglo de nombres de clientes
-                    const clientesEventos = data;
-                    console.log("Data Recibida despues del fetch: " + data);
-
+                    console.log("Entro al data");
                     // Obtén la tabla por su id
                     const tablaClientes = document.getElementById("tablaClientes");
-
+                    console.log("Data recibida de getClientes: " + data.text);
                     // Verifica si la tabla existe
                     if (tablaClientes) {
-                        // Elimina la fila "Cargando..."
-                        tablaClientes.deleteRow(0);
+                        // Elimina todas las filas existentes en la tabla
+                        while (tablaClientes.rows.length > 1) {
+                            tablaClientes.deleteRow(1);
+                            console.log("Elimino fila previa a la carga de las nuevas.");
+                        }
 
-                        // Agrega una fila por cada cliente
-                        for (const cliente of clientesEventos) {
+                        // Agrega una fila por cada cliente con su dirección IP
+                        //for (const cliente of JSON.parse(data)) {
+                            for (const cliente of data) {    
                             const row = tablaClientes.insertRow();
-                            const cell = row.insertCell();
-                            cell.textContent = cliente;
+                            //const clienteCell = row.insertCell(0);
+                            //const direccionIPCell = row.insertCell(1);
+                            console.log("Procesando Cliente: " + cliente);
+                            const direccionIPCell = row.insertCell(0);
+                            direccionIPCell.textContent = cliente.cliente;
+                            direccionIPCell.textContent = cliente.cliente; // Supongo que la dirección IP está en la propiedad "cliente"
                         }
                     }
                 })
                 .catch(error => {
+                    console.log("Entro al error");
                     console.error("Error al obtener la lista de clientes:", error);
                 });
         }
@@ -478,7 +490,7 @@
         document.getElementById('enviar').addEventListener('click', enviarDatos);
         document.addEventListener("DOMContentLoaded", function() {
             setInterval(actualizarListado, 15000); // 5000 milisegundos = 5 segundos
-            setInterval(cargarClientes, 5000); // 5000 milisegundos = 5 segundos
+            setInterval(cargarClientes, 15000); // 5000 milisegundos = 5 segundos
             //setInterval(registrarCliente, 2000);
             actualizarListado();
             //registrarCliente();

@@ -115,6 +115,11 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-type', 'text/plain')
                 self.end_headers()
                 self.wfile.write("Archivo no encontrado".encode())
+            except ConnectionResetError as e:
+                # Captura la excepción ConnectionResetError
+                print(f"Se produjo un error de conexión: {e}")
+                # Imprime un mensaje personalizado
+                print("La conexión se restableció abruptamente por el cliente por cambio de video.")
         # Listar Videos
         elif self.path == '/listar_archivos':
             archivos = listar_archivos()
@@ -143,6 +148,35 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(response_json.encode()) 
+        # Servicio que envía un JSON con el listado de clientes
+        elif self.path == '/getClientes':
+            # Retorna algo en este formato: [{"cliente": "192.168.18.101"}, {"cliente": "192.168.18.112"}]
+            # Obtén la dirección IP de la interfaz en la que se está escuchando
+            server_ip = socket.gethostbyname(socket.gethostname())
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            #self.send_header('Cache-Control', 'no-cache')
+            #self.send_header('Connection', 'keep-alive')
+            #self.send_header('Access-Control-Allow-Origin', f'http://{server_ip}:8000')  # Reemplaza 8000 por el puerto adecuado
+            self.end_headers()
+            
+            # Filtra las direcciones IP válidas y las convierte en JSON
+            #print("Llamado a /getClientes.")
+            #for cliente in clientes:
+            #    print("Cliente: ", cliente)
+            
+            # Crea una lista de diccionarios con el formato deseado
+            json_data = [{"cliente": ip} for ip in clientes]
+
+            # Convierte la lista de diccionarios en una cadena JSON
+            #json_string = json.dumps(json_data, indent=4)
+            json_string = json.dumps(json_data)
+
+            # Ahora puedes enviar 'json_string' al cliente
+            print(json_string.encode('utf-8'))
+            self.wfile.write(json_string.encode('utf-8'))
+            #print("Fin del getClientes")
         else:
             self.send_response(404)
             self.send_header('Content-type', 'text/plain')
@@ -263,38 +297,16 @@ class EventosHandler(BaseHTTPRequestHandler):
                                 print("Error al enviar mensaje al cliente:", str(e))
                                 # Elimina al cliente si hay un error
                                 clientes_eventos.remove(cliente)
+                                client_ip = self.client_address[0]
+                                print("********************Cliente desconectado: ", str(client_ip))
+                                clientes.remove(client_ip)
                     
                     # Simula un intervalo de tiempo (ajusta según tus necesidades)
                     time.sleep(1)
             except Exception as e:
-                print("Cliente desconectado:", str(e))
+                print("********************Cliente desconectado:", str(e))
                 # Elimina al cliente de la lista cuando se desconecta
-                clientes_eventos.remove(self)
-
-        # Servicio que envía un JSON con el listado de clientes
-        elif self.path == '/getClientes':
-            # Obtén la dirección IP de la interfaz en la que se está escuchando
-            server_ip = socket.gethostbyname(socket.gethostname())
-
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Cache-Control', 'no-cache')
-            self.send_header('Connection', 'keep-alive')
-            self.send_header('Access-Control-Allow-Origin', f'http://{server_ip}:8000')  # Reemplaza 8000 por el puerto adecuado
-            self.end_headers()
-            
-            # Filtra las direcciones IP válidas y las convierte en JSON
-
-            for cliente in clientes
-
-            clientes_copy = [ip for ip in clientes_eventos if isinstance(ip, str)]
-            
-            clientes_json = json.dumps(clientes_copy)
-
-            # Imprimir el contenido del JSON en la salida del servidor
-            print("JSON generado en /getClientes:", clientes_json)
-
-            self.wfile.write(clientes_json.encode('utf-8'))
+                clientes_eventos.remove(self)        
 
 def iniciar_servidores():
     PORT = 8000
