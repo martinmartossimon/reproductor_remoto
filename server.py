@@ -81,6 +81,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 pathBuscado='Archivo no encontrado en: .' + template_path + "cliente.html"
                 self.wfile.write(pathBuscado.encode())
+        # Endpoint de url del visor
         elif self.path == '/viewer':
             try:
                 # Abre el archivo HTML solicitado en modo lectura binaria
@@ -153,30 +154,19 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             # Retorna algo en este formato: [{"cliente": "192.168.18.101"}, {"cliente": "192.168.18.112"}]
             # Obtén la dirección IP de la interfaz en la que se está escuchando
             server_ip = socket.gethostbyname(socket.gethostname())
-
+            # Defino cabeceras
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
-            #self.send_header('Cache-Control', 'no-cache')
-            #self.send_header('Connection', 'keep-alive')
-            #self.send_header('Access-Control-Allow-Origin', f'http://{server_ip}:8000')  # Reemplaza 8000 por el puerto adecuado
-            self.end_headers()
-            
-            # Filtra las direcciones IP válidas y las convierte en JSON
-            #print("Llamado a /getClientes.")
-            #for cliente in clientes:
-            #    print("Cliente: ", cliente)
-            
+            self.end_headers()            
             # Crea una lista de diccionarios con el formato deseado
             json_data = [{"cliente": ip} for ip in clientes]
-
             # Convierte la lista de diccionarios en una cadena JSON
             #json_string = json.dumps(json_data, indent=4)
             json_string = json.dumps(json_data)
-
             # Ahora puedes enviar 'json_string' al cliente
             print(json_string.encode('utf-8'))
             self.wfile.write(json_string.encode('utf-8'))
-            #print("Fin del getClientes")
+        # Endpoint no encontrado
         else:
             self.send_response(404)
             self.send_header('Content-type', 'text/plain')
@@ -253,7 +243,47 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps({"mensaje": "Accion no reconocida"}).encode('utf-8'))
                 return
-
+        # Funcion para borrar un video del listado de videos
+        elif self.path == '/borrarVideo':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                # Decodifica el JSON recibido
+                data = json.loads(post_data.decode())
+                video_a_borrar = data.get('nombre_video')
+                
+                # Verifica que se proporcionó el nombre del video a borrar
+                if video_a_borrar:
+                    # Construye la ruta completa al video a borrar
+                    video_path = os.path.join(directorio, video_a_borrar)
+                    
+                    # Verifica si el archivo existe y es un archivo regular (no un directorio)
+                    if os.path.isfile(video_path):
+                        # Elimina el video
+                        os.remove(video_path)
+                        print("Archivo Borrado: ", video_path)
+                        self.send_response(200)
+                        self.send_header('Content-type', 'application/json')
+                        self.end_headers()
+                        self.wfile.write(json.dumps({"mensaje": "Video eliminado correctamente"}).encode('utf-8'))
+                    else:
+                        # Si el archivo no existe, devuelve un mensaje de error
+                        self.send_response(404)
+                        self.send_header('Content-type', 'application/json')
+                        self.end_headers()
+                        self.wfile.write(json.dumps({"error": "El video no existe"}).encode('utf-8'))
+                else:
+                    # Si no se proporcionó el nombre del video, devuelve un mensaje de error
+                    self.send_response(400)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"error": "Debe proporcionar el nombre del video a borrar"}).encode('utf-8'))
+            except json.JSONDecodeError:
+                self.send_response(400)  # Devuelve un código de respuesta 400 si los datos no son JSON válidos
+                self.send_header('Content-type', 'text/plain')
+                self.end_headers()
+                self.wfile.write("Datos JSON no válidos".encode())
+        # Error de Endpoint no encontrado
         else:
             self.send_response(404)
             self.send_header('Content-type', 'text/plain')
