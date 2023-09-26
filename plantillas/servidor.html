@@ -82,6 +82,7 @@
         /******************************** 
         * ACTUALIZAR EL LISTADO
         * Recibe JSON: ["13COMANDOSRAROS.mp4", "ConcordeJustKis.mp4", "T10x4Debatokere.mp4"]
+        * !! DEPRECADO !!
         ********************************/
         function actualizarListado(){
             console.log("Actualizando el listado...");
@@ -151,12 +152,7 @@
                     // Obtén la tabla existente
                     const tablaReproduccion = document.getElementById('tablaListaReproduccion');
                     const tbody = tablaReproduccion.querySelector('tbody');
-                    
-                    // Elimina las filas existentes en la tabla, excepto la primera (encabezado)
-                    //while (tbody.rows.length > 1) {
-                    //    tbody.deleteRow(1);
-                    //}
-                    // Limpia el contenido del cuerpo de la tabla
+                                        
                     tbody.innerHTML = '';
 
                     // Reinicializar la lista de archivos
