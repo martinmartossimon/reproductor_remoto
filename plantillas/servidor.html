@@ -8,13 +8,13 @@
     <style>
         .contenido {
             display: grid;
-            grid-template-columns: 75% 25%; /* Divide en dos columnas, 75% y 25% */
-            /*background-color: #1369cc; /* Color de fondo de la fila */
-            /*border: 1px solid #ddd; /* Borde para separar las columnas */
-            /* ... Estilos para el tema claro ... */
-            /*background-color: #1369cc; /* Color de fondo de la fila */
-            /*border: 1px solid #ddd; /* Borde para separar las columnas */
+            grid-template-columns: 75% 25%;
+            /* background-color: #d4ff00; */
+            flex: 1; /* Ocupa todo el espacio vertical restante */
+            /* height: 490px; */
+            height: calc(77vh);
         }
+
         body {
             background-color: #fff;
             position: relative; /* Permite que el contenido fluya bajo el botón */
@@ -45,8 +45,11 @@
             flex-direction: column;
             align-items: center; /* Alinea al centro horizontalmente */
             justify-content: flex-start; /* Alinea arriba verticalmente */
-            max-height: 490px;
+            /*max-height: 490px;*/
+            max-height: 90%;
             overflow-y: auto;
+            scrollbar-width: thin; /* Ancho de la barra de desplazamiento (puede ser "auto" o "thin") */
+            scrollbar-color: gray lightgray; /* Color de la barra y el fondo de la barra de desplazamiento */            
         }
 
         /* Estilos para la parte derecha (clientes) */
@@ -57,7 +60,7 @@
             align-items: center; /* Alinea al centro horizontalmente */
         }
 
-        #DivMiniatura,
+        #eventos,
         #DivTablaClientes,
         #DivControlesReproduccion {
             margin: 20px 0; /* Agrega 20px de margen vertical */
@@ -238,6 +241,32 @@
         body.dark-theme table td {
             border: 1px solid #444; /* Cambia el borde de las celdas de datos en tema oscuro */
         }
+
+        .lista-eventos {
+            max-width: 95%;
+            max-height: 200px; /* Altura máxima de la lista */
+            overflow-y: auto; /* Agrega scroll vertical cuando sea necesario */
+            border: 1px solid #ccc; /* Un borde para darle estilo */
+            padding: 2px; /* Espacio interior */
+            background-color: #f9f9f9; /* Color de fondo */
+            font-size: 8px;
+        }
+
+        .lista-eventos.dark-theme {
+            background-color: #000000;
+            color: #d4ff00;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid gray;
+            width: 80%; /* Establece el ancho al 80% del contenedor */
+        }
+
+        .highlight {
+            background: radial-gradient(circle, rgba(0, 128, 0, 0.468), rgba(7, 186, 25, 0.715));
+            transition: background-color 4s; /* Duración de la transición de 1 segundo */
+        }
     </style>
 </head>
 <body>
@@ -290,11 +319,9 @@
                 </table>    
                 
             </div>
-            <div id="DivMiniatura">
-                <table>
-                    <tr><th>Miniatura</th></tr>
-                    <tr><td><button>Aqui va la miniatura</button></td></tr>
-                </table>  
+            <div id="eventos" class="lista-eventos">
+                <!-- Aquí se mostrarán los eventos -->
+                <div>... Esperando Eventos ...</div>
             </div>
         </div>
     </div>    
@@ -697,6 +724,37 @@
                 });
         }
 
+        /*
+        Agregar Eventos
+        */
+        function agregarEvento(texto) {
+            const eventosDiv = document.getElementById("eventos");
+            const eventoNuevo = document.createElement("div");
+            eventoNuevo.textContent = texto;
+
+            // Agregar una barra horizontal antes del eventoNuevo (si no es el primer evento)
+            if (eventosDiv.firstChild !== null) {
+                const hrElement = document.createElement("hr");
+                eventosDiv.insertBefore(hrElement, eventosDiv.firstChild);
+            }
+
+            eventosDiv.insertBefore(eventoNuevo, eventosDiv.firstChild);
+
+            // Limitar la cantidad de eventos mostrados (por ejemplo, a 100)
+            const eventos = eventosDiv.getElementsByTagName("div");
+            if (eventos.length > 100) {
+                eventosDiv.removeChild(eventos[100]);
+            }
+
+            // Agregar la clase "highlight" al último div
+            eventoNuevo.classList.add("highlight");
+
+            // Usar setTimeout para quitar la clase después de 1 segundo
+            setTimeout(function() {
+                eventoNuevo.classList.remove("highlight");
+            }, 4000); // 1000 milisegundos = 1 segundo
+        }
+
         /* 
         * Listeners 
         */
@@ -716,12 +774,14 @@
         button.addEventListener('click', () => {
             darkModeEnabled = !darkModeEnabled; // Alternar entre temas oscuro y claro
             const body = document.body;
+            const eventos = document.getElementById
 
             if (darkModeEnabled) {
                 document.body.style.backgroundColor = '#333'; // Cambia el fondo a un color oscuro
                 document.body.style.color = '#fff'; // Cambia el color del texto a blanco
 
                 body.classList.add('dark-theme'); // Agregar la clase 'dark-theme' al cuerpo
+                document.getElementById("eventos").classList.add("dark-theme");
                 console.log('Tema oscuro activado');
                 button.innerHTML = '<span>&#x1F4A1;</span> Encender';
 
@@ -735,6 +795,7 @@
                 document.body.style.color = '#000000'; // Cambia el color del texto a blanco
 
                 body.classList.remove('dark-theme'); // Eliminar la clase 'dark-theme' del cuerpo
+                document.getElementById("eventos").classList.remove("dark-theme");
                 console.log('Tema claro activado');
                 button.innerHTML = '<span>&#x1F4A1;</span> Apagar';
                 // Restaurar estilos anteriores del botón aquí si es necesario
@@ -746,6 +807,24 @@
                 });
             }
         });
+
+        /***************************************
+        * Manejador de mensajes con el backend
+        ***************************************/
+        var host = window.location.hostname;
+        var endpoint = '/eventosServidor';
+        var url = 'http://' + host + ":8001" + endpoint;
+        const eventSource = new EventSource(url);
+        //const eventSource = new EventSource('http://localhost:8001/eventos');
+
+        // Maneja eventos recibidos del servidor
+        eventSource.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            //console.log("Recibido mensaje!: " + data);
+            console.log("Recibido mensaje del backend:", JSON.stringify(data, null, 2));
+
+            agregarEvento(data.fecha + " - " + data.mensaje);
+        };
     </script>
     <script src="/reproductor.js"></script>
 </body>

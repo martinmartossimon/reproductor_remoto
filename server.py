@@ -15,6 +15,7 @@ import datetime
 
 directorio = "./contenido"
 mensajes = [] # [{'accion': 'reproducir', 'video': 'FalsaPROPAGANDA.mp4', 'fecha': '2023-09-25 01:05:30'}]
+mensajes_servidor = []
 clientes_eventos = [] #Lista de objetos EventosHandler
 servidor_eventos = [] #Lista de objetos EventosHandler
 clientes = [] #Lista strings de IP de clientes
@@ -106,11 +107,28 @@ def descargarVideoYoutube(url):
         proceso = subprocess.Popen(f"sh {script_path} {urlLimpia}", shell=True)
         pid = proceso.pid
         print("PID del proceso:", pid)
+        fecha_actual = datetime.datetime.now()
+        fecha_actual_str = fecha_actual.strftime("%Y-%m-%d %H:%M:%S")
+        data = {}
+        data["fecha"] = fecha_actual_str
+        data["tipo"] = "Informativo"
+        data["mensaje"] = "Iniciada la descarga de " + url + " PID: " + str(pid)
+        mensajes_servidor.append(data)
         
         # Define una función para esperar a que el proceso se complete
         def esperar_proceso():
             proceso.wait()
             print("El proceso de descarga de URL ha finalizado.")
+            # Obtener la fecha y hora actual
+            fecha_actual = datetime.datetime.now()
+            # Formatear la fecha y hora como una cadena
+            fecha_actual_str = fecha_actual.strftime("%Y-%m-%d %H:%M:%S")
+            # Le añado el campo fecha al json
+            data = {}
+            data["fecha"] = fecha_actual_str
+            data["tipo"] = "Informativo"
+            data["mensaje"] = "La descarga de " + url + " PID: " + str(pid) + " a finalizado"
+            mensajes_servidor.append(data) #Ejemplo de JSON que generaria: {"fecha": "2023-09-25 23:13:53", "tipo": "Informativo", "mensaje": "La descarga de https://www.youtube.com/shorts/CydLonBn3M PID: 127541 a finalizado"
 
         
         # Crea un hilo para esperar al proceso en segundo plano
@@ -118,8 +136,23 @@ def descargarVideoYoutube(url):
         hilo_espera.start()
         
     except subprocess.CalledProcessError as e:
+         # Obtener la fecha y hora actual
+        data = {}
+        fecha_actual = datetime.datetime.now()
+        # Formatear la fecha y hora como una cadena
+        fecha_actual_str = fecha_actual.strftime("%Y-%m-%d %H:%M:%S")
+        data["fecha"] = fecha_actual_str
+        data["tipo"] = "Error"
+        data["mensaje"] = "Error en a descarga de " + url + " - Error al ejecutar el script."
         print(f"Error al ejecutar el script: {e}")
     except FileNotFoundError:
+        data = {}
+        fecha_actual = datetime.datetime.now()
+        # Formatear la fecha y hora como una cadena
+        fecha_actual_str = fecha_actual.strftime("%Y-%m-%d %H:%M:%S")
+        data["fecha"] = fecha_actual_str
+        data["tipo"] = "Error"
+        data["mensaje"] = "Error en a descarga de " + url + " - No se encontro el archivo con el script de descarga del video."
         print("No se encontró el archivo del script.")
 
 # Manda mensaje a viewers: {"fecha": "2023-09-25 02:37:23", "accion": "Ping"}
@@ -134,10 +167,10 @@ def queryClientesAlive():
     data["accion"] = "Ping"
     mensajes.append(data)
     print("PING!!")
-    for cliente in clientes:
-        print("Cliente - ", cliente)
-    for cliente_E in clientes_eventos:
-        print("Cliente_E - ", cliente_E)
+    #for cliente in clientes:
+    #    print("Cliente - ", cliente)
+    #for cliente_E in clientes_eventos:
+    #    print("Cliente_E - ", cliente_E)
 
 
 # Definir el manejador de solicitudes personalizado
@@ -249,11 +282,11 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         # Genera un JSON con el siguiente detalle: [{"archivo": "DEMONSCRESTSUPE.mp4", "tamano": "91.84 MB", "Fecha_Creacion": "25/09/2023 00:54"}, {"archivo": "Informativomati.mp4", "tamano": "7.17 MB", "Fecha_Creacion": "25/09/2023 09:43"}]
         elif self.path == '/listar_archivos_detalle':
             resultado_json = listar_archivos_detalle()         
-            print("Tipo de dato de resultado_json: ", type(resultado_json))
+            #print("Tipo de dato de resultado_json: ", type(resultado_json))
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            print("Enviando JSON: ", resultado_json.encode())
+            #print("Enviando JSON: ", resultado_json.encode())
             self.wfile.write(resultado_json.encode())
         # Anadir Cliente. Envia el siguiente json: {"estado": "Conectado"}
         elif self.path == '/addCliente':
@@ -285,7 +318,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             #json_string = json.dumps(json_data, indent=4)
             json_string = json.dumps(json_data)
             # Ahora puedes enviar 'json_string' al cliente
-            print(json_string.encode('utf-8'))
+            #print(json_string.encode('utf-8'))
             self.wfile.write(json_string.encode('utf-8'))
         # Endpoint no encontrado
         else:
@@ -337,6 +370,11 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
                 self.wfile.write(json.dumps({"mensaje": "Comando de reproducción enviado a los clientes"}).encode('utf-8'))
+                data = {}
+                data["fecha"] = fecha_actual_str
+                data["tipo"] = "Informativo"
+                data["mensaje"] = "Reproduciendo video: " + video
+                mensajes_servidor.append(data)
                 return
             else:
                 self.send_response(200)
@@ -367,6 +405,17 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                         self.send_header('Content-type', 'application/json')
                         self.end_headers()
                         self.wfile.write(json.dumps({"mensaje": "Video eliminado correctamente"}).encode('utf-8'))
+                        # Eventos:
+                        fecha_actual = datetime.datetime.now()
+                        # Formatear la fecha y hora como una cadena
+                        fecha_actual_str = fecha_actual.strftime("%Y-%m-%d %H:%M:%S")
+                        # Le añado el campo fecha al json
+                        data = {}
+                        data["fecha"] = fecha_actual_str
+                        data["tipo"] = "Informativo"
+                        data["mensaje"] = "Borrado el video: " + video_a_borrar
+                        mensajes_servidor.append(data)
+
                     else:
                         # Si el archivo no existe, devuelve un mensaje de error
                         self.send_response(404)
@@ -410,7 +459,7 @@ class EventosHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         # Servicio para el intercambio de mensajes con los clientes
         if self.path == '/eventos':
-            print("Llamada a /eventos - Contenido de clientes eventos: ", clientes_eventos)
+            #print("Llamada a /eventos - Contenido de clientes eventos: ", clientes_eventos)
             # Obtén la dirección IP de la interfaz en la que se está escuchando
             server_ip = socket.gethostbyname(socket.gethostname())
             client_ip = self.client_address[0]
@@ -426,6 +475,16 @@ class EventosHandler(BaseHTTPRequestHandler):
             if self not in clientes_eventos:
                 print("!!!!!!!! Agrego cliente nuevo porque no existia: ", str(client_ip))
                 clientes_eventos.append(self)
+                # Evento para el Servidor
+                fecha_actual = datetime.datetime.now()
+                fecha_actual_str = fecha_actual.strftime("%Y-%m-%d %H:%M:%S")
+                data = {}
+                data["fecha"] = fecha_actual_str
+                data["tipo"] = "Informativo"
+                data["mensaje"] = "Nuevo Cliente Conectado en: " + client_ip
+                mensajes_servidor.append(data)
+
+
             print("No agrego ya que el cliente existia previamente: ", str(client_ip))
             try: # Mantener la conexión abierta
                 while True:
@@ -441,20 +500,80 @@ class EventosHandler(BaseHTTPRequestHandler):
                                 cliente.wfile.write(mensaje.encode('utf-8'))
                             except Exception as e:
                                 print("Error al enviar mensaje al cliente:", str(e))
+                                # Evento para el Servidor
+                                fecha_actual = datetime.datetime.now()
+                                fecha_actual_str = fecha_actual.strftime("%Y-%m-%d %H:%M:%S")
+                                data = {}
+                                data["fecha"] = fecha_actual_str
+                                data["tipo"] = "Informativo"
+                                data["mensaje"] = "Cliente Desconectado en: " + str(cliente.client_address[0])
+                                mensajes_servidor.append(data)
+
                                 # Elimina al cliente si hay un error
                                 clientes_eventos.remove(cliente)
                                 print("********************Cliente desconectado - Borrando de clientes también: ", str(cliente.client_address[0]))
                                 clientes.remove(cliente.client_address[0])
+                
                     
                     # Simula un intervalo de tiempo (ajusta según tus necesidades)
                     time.sleep(1)
             except Exception as e:
                 print("********************Cliente desconectado:", str(e))
                 # Elimina al cliente de la lista cuando se desconecta
+                # Evento para el Servidor
+                fecha_actual = datetime.datetime.now()
+                fecha_actual_str = fecha_actual.strftime("%Y-%m-%d %H:%M:%S")
+                data = {}
+                data["fecha"] = fecha_actual_str
+                data["tipo"] = "Informativo"
+                data["mensaje"] = "Cliente Desconectado en: " + str(cliente.ip)
+                mensajes_servidor.append(data)
                 clientes.remove(client_ip)
                 clientes_eventos.remove(self)
-        elif.path == '/eventosServidor':
+        # /eventosServidor para el intercambio con las instancias de servidor y que estén sincronizadas.
+        elif self.path == '/eventosServidor':
+            #print("Llamada a /eventosServidor - Contenido de servidor_eventos: ", servidor_eventos)
+            # Obtén la dirección IP de la interfaz en la que se está escuchando
+            server_ip = socket.gethostbyname(socket.gethostname())
+            client_ip = self.client_address[0]
 
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/event-stream')
+            self.send_header('Cache-Control', 'no-cache')
+            self.send_header('Connection', 'keep-alive')
+            self.send_header('Access-Control-Allow-Origin', f'http://{server_ip}:8000')  # Reemplaza 8000 por el puerto adecuado
+            self.end_headers()
+
+            
+            if self not in servidor_eventos:
+                print("!!!!!!!! Agrego servidor nuevo a servidor_eventos porque no existia: ", str(client_ip))
+                servidor_eventos.append(self)
+            print("No agrego ya que el servidor existia previamente en servidor_eventos: ", str(client_ip))
+            try: # Mantener la conexión abierta
+                while True:
+                    # Envía eventos a todos los clientes de eventos
+                    if mensajes_servidor:
+                        evento = mensajes_servidor.pop(0)
+                        mensaje = f"data: {json.dumps(evento)}\n\n"
+                        
+                        # Envía el mensaje a todos los clientes de eventos
+                        for cliente in servidor_eventos:
+                            try:
+                                print("Mensaje enviado a servidor_eventos: ", str(cliente.client_address[0]))
+                                cliente.wfile.write(mensaje.encode('utf-8'))
+                            except Exception as e:
+                                print("Error al enviar mensaje al servidor_eventos:", str(e))
+                                # Elimina al cliente si hay un error
+                                servidor_eventos.remove(cliente)
+                                print("**Servidor desconectado - Borrando de servidor_eventos también: ", str(cliente.client_address[0]))
+                                #clientes.remove(cliente.client_address[0])                    
+                    # Simula un intervalo de tiempo (ajusta según tus necesidades)
+                    time.sleep(1)
+            except Exception as e:
+                print("**servidor_eventos desconectado:", str(e))
+                # Elimina al cliente de la lista cuando se desconecta
+                #clientes.remove(client_ip)
+                servidor_eventos.remove(self)
         else:
             self.send_response(404)
             self.send_header('Content-type', 'text/plain')
@@ -477,12 +596,14 @@ def iniciar_servidores():
         eventos_server = ThreadingHTTPServer(("", eventos_port), EventosHandler)
         eventos_thread = threading.Thread(target=eventos_server.serve_forever)
         eventos_thread.start()
-
+      
         hilo_ping_clientes = threading.Thread(target=ping_clientes)
         hilo_ping_clientes.start()
-        
+
         # Iniciar el servidor web
         httpd.serve_forever()
+
+        
 
 if __name__ == "__main__":
     # Iniciar ambos servidores en hilos separados
