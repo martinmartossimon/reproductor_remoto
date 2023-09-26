@@ -58,7 +58,7 @@ def obtener_duracion_video(ruta_archivo):
     except Exception as e:
         return None
 
-# Genera un JSON similar a: [{"archivo": "DEMONSCRESTSUPE.mp4", "tamano": "91.84 MB", "Fecha_Creacion": "25/09/2023 00:54"}, {"archivo": "Informativomati.mp4", "tamano": "7.17 MB", "Fecha_Creacion": "25/09/2023 09:43"}]
+# Genera un JSON similar a: [{"archivo": "13COMANDOSRAROS.mp4", "tamano": "939.55 MB", "Fecha_Creacion": "20/09/2023 13:38", "duracion_segundos": 991.747483, "duracion_hms": "00:16:31"}, {"archivo": "ConcordeJustKis.mp4", "tamano": "6.37 MB", "Fecha_Creacion": "20/09/2023 21:32", "duracion_segundos": 300.721633, "duracion_hms": "00:05:00"}]
 def listar_archivos_detalle(): 
     try:
         # archivos = [nombre for nombre in os.listdir(directorio) if nombre.endswith('.mp4')]
@@ -94,7 +94,7 @@ def listar_archivos_detalle():
             archivo_info['duracion_hms'] = duracion['duracion']
 
             archivos_con_info.append(archivo_info)
-
+        #print(json.dumps(archivos_con_info, ensure_ascii=False))
         return json.dumps(archivos_con_info, ensure_ascii=False)
     except Exception as e:
         return str(e)

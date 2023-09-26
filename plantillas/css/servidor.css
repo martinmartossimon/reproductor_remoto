@@ -156,7 +156,7 @@ td {
 }
 
 .lista-eventos.dark-theme {
-    background-color: #000000;
+    background-color: #00000071;
     color: #d4ff00;
 }
 
@@ -169,7 +169,7 @@ hr {
 
 /* Resaltado */
 .highlight {
-    background: radial-gradient(circle, rgba(0, 128, 0, 0.468), rgba(7, 186, 25, 0.715));
+    background: radial-gradient(circle, rgba(0, 128, 0, 0.468), rgba(7, 186, 25, 0.394));
     transition: background-color 4s;
 }
 
@@ -236,4 +236,43 @@ body.dark-theme .detalleActualizacion {
     top: 1px;
     right: 1px;
     z-index: 999;
+}
+
+.input-personalizado {
+    border: 2px solid rgba(29, 14, 146, 0.557);; /* Color de borde verde */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 2px; /* Espacio interno para el texto */
+    width: 200px; /* Ancho del input */
+    font-size: 12px; /* Tamaño de fuente */
+    width: 45%;
+}
+
+/* Estilo adicional cuando el input está enfocado (opcional) */
+.input-personalizado:focus {
+    outline: none; /* Elimina el borde de enfoque predeterminado */
+    box-shadow: 0 0 5px #00cc00; /* Sombra al enfocar */
+    place-content: "";
+}
+
+/* Estilos para el input personalizado en tema oscuro */
+.input-personalizado.dark-theme {
+    border-color: rgba(29, 14, 146, 0.557); /* Cambia el color de borde en modo oscuro */
+    background-color: #222; /* Cambia el fondo en modo oscuro */
+    color: #fff; /* Cambia el color del texto en modo oscuro */
+}
+
+/* Estilo adicional cuando el input está enfocado en tema oscuro */
+.input-personalizado.dark-theme:focus {
+    box-shadow: 0 0 5px #00cc00; /* Cambia la sombra al enfocar en modo oscuro */
+}
+
+body.dark-theme .input-personalizado {
+    border-color: rgba(29, 14, 146, 0.557); /* Cambia el color de borde en modo oscuro */
+    background-color: #222; /* Cambia el fondo en modo oscuro */
+    color: #fff; /* Cambia el color del texto en modo oscuro */
+}
+
+/* Estilo adicional cuando el input está enfocado en tema oscuro */
+body.dark-theme .input-personalizado:focus {
+    box-shadow: 0 0 5px #00cc00; /* Cambia la sombra al enfocar en modo oscuro */
 }
