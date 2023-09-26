@@ -269,6 +269,21 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 print(f"Se produjo un error de conexión: {e}")
                 # Imprime un mensaje personalizado
                 print("La conexión se restableció abruptamente por el cliente por cambio de video.")
+        # Servir contenido CSS de la carpeta /plantillas/css
+        elif self.path.startswith('/plantillas/css/'):
+            # Ruta a la carpeta de estilos CSS
+            try:
+                with open('.' + self.path, 'rb') as file:
+                    content = file.read()
+                self.send_response(200)  # Código de respuesta OK (200)
+                self.send_header('Content-type', 'text/css')  # Tipo de contenido CSS
+                self.end_headers()
+                self.wfile.write(content)
+            except FileNotFoundError:
+                self.send_response(404)
+                self.send_header('Content-type', 'text/plain')
+                self.end_headers()
+                self.wfile.write("Archivo no encontrado".encode())
         # Listar Videos: Envia algo así: ["13COMANDOSRAROS.mp4", "ConcordeJustKis.mp4", "T10x4Debatokere.mp4"]
         elif self.path == '/listar_archivos':
             archivos = listar_archivos()

@@ -1,0 +1,261 @@
+.contenido {
+    display: grid;
+    grid-template-columns: 75% 25%;
+    /* background-color: #d4ff00; */
+    flex: 1; /* Ocupa todo el espacio vertical restante */
+    /* height: 490px; */
+    height: calc(77vh);
+}
+
+body {
+    background-color: #fff;
+    position: relative; /* Permite que el contenido fluya bajo el botón */
+    /*padding: 1px; /* Agrega margen para evitar la superposición del contenido */
+}
+
+body.dark-theme {
+    background-color: #000000;
+    color: rgb(251, 251, 251);
+}
+
+/* Estilos para tema oscuro */
+body.dark-theme .contenido {
+    background-color: #333; /* Color de fondo de la fila en tema oscuro */
+    /*border: 1px solid #555; /* Borde para separar las columnas en tema oscuro */
+}
+
+/* Estilo para el pie de página en tema oscuro */
+body.dark-theme .detalleActualizacion {
+    background-color: #111; /* Color de fondo en tema oscuro */
+    color: #fff; /* Color de texto en tema oscuro */
+    border-top: 1px solid #333; /* Borde superior en tema oscuro */
+    border-left: 1px solid #333; /* Borde izquierdo en tema oscuro */
+}
+
+#listaDeReproduccion {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Alinea al centro horizontalmente */
+    justify-content: flex-start; /* Alinea arriba verticalmente */
+    /*max-height: 490px;*/
+    max-height: 90%;
+    overflow-y: auto;
+    scrollbar-width: thin; /* Ancho de la barra de desplazamiento (puede ser "auto" o "thin") */
+    scrollbar-color: gray lightgray; /* Color de la barra y el fondo de la barra de desplazamiento */            
+}
+
+/* Estilos para la parte derecha (clientes) */
+#Controles {
+    /* background-color: #4CAF50; ]*/
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Alinea al centro horizontalmente */
+}
+
+#eventos,
+#DivTablaClientes,
+#DivControlesReproduccion {
+    margin: 20px 0; /* Agrega 20px de margen vertical */
+}
+
+#tablaListaReproduccion td{
+    border-spacing: 1px; /* Ajusta el espacio entre filas y columnas, puedes cambiar el valor según tus preferencias */
+}
+
+#DivTablaClientes {
+    width: 80%;
+    /*padding-left: 10px;
+    padding-right: 10px;*/
+    display: flex;
+    justify-content: center; /* Alineación horizontal */
+    align-items: center; /* Alineación vertical */
+}
+
+.popup {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #4CAF50; /* Fondo verde */
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px; /* Esquinas redondeadas */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+table {
+    width: 80%;
+    border-collapse: collapse;
+    font-size: 10px;
+}
+
+/* Estilo para las celdas de encabezado th */
+th {
+    background-color: #333; /* Color de fondo para las celdas de encabezado */
+    color: white; /* Color de texto para las celdas de encabezado */
+    padding: 5px; /* Espaciado interno */
+    text-align: center; /* Alineación del texto a la izquierda */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+/* Estilo para las filas pares */
+tr:nth-child(even) {
+    background-color: #f2f2f2; /* Color de fondo para filas pares */
+}
+
+/* Estilo para las filas impares */
+tr:nth-child(odd) {
+    background-color: #ffffff; /* Color de fondo para filas impares */
+}
+
+/* Resaltado de la linea seleccionada */
+#tablaListaReproduccion tr:hover {
+    background-color: yellow; /* Cambia el color de fondo a amarillo cuando se pasa el mouse */
+}
+
+/* Estilo para las celdas de datos td */
+td {
+    padding: 5px; /* Espaciado interno */
+    text-align: left; /* Alineación del texto a la izquierda */
+    border-radius: 5px; /* Bordes redondeados */
+    border: 1px solid #ddd; /* Borde con color de fondo */
+}
+
+/* Estilo para las filas marcadas con la clase 'seleccionada' */
+.seleccionada {
+    background-color: lime !important;
+}
+
+.seleccionada button {
+    /* background-color: gray;*/ /* Cambia el color de fondo de los botones en filas seleccionadas */
+    color: rgb(0, 0, 0); /* Cambia el color del texto de los botones en filas seleccionadas */
+    cursor: not-allowed; /* Cambia el cursor del mouse a "no permitido" en filas seleccionadas */
+}
+
+.controlesReproduccion {
+    display: flex;
+    justify-content: flex-start; /* Alinea a la izquierda horizontalmente */
+    align-items: flex-start; /* Alinea arriba verticalmente */
+    margin: 10px; /* Agrega un pequeño margen alrededor del contenedor */
+    font-size: 10px;
+}
+
+/* Estilos para el pie de página */
+.detalleActualizacion {
+    position: fixed; /* Fija la posición del elemento */
+    bottom: 0; /* Lo coloca en la parte inferior */
+    right: 0; /* Lo coloca en la parte derecha */
+    background-color: #f2f2f2; /* Color de fondo */
+    padding: 5px 10px;/* Espaciado interno */
+    border-top: 1px solid #ddd; /* Borde superior */
+    border-left: 1px solid #ddd; /* Borde izquierdo */
+    font-size: 10px;
+}
+
+table.clientes {
+    /* padding: 100px; */
+    width: 100%;
+    text-align: center;
+}
+
+table.clientes td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Estilo para filas pares */
+table.clientes tbody tr:nth-child(even) {
+    background-color: #f2f2f2; /* Cambia el color de fondo para filas pares */
+}
+
+/* Estilo para filas impares */
+table.clientes tbody tr:nth-child(odd) {
+    background-color: #ffffff; /* Cambia el color de fondo para filas impares */
+}
+
+/* Estilo base del botón con icono de bombilla */
+.button-with-icon {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 5px;
+    background-color: #000000; /* Color de fondo del botón */
+    color: rgb(255, 255, 255); /* Color del texto del botón */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 10px;
+}
+
+/* Estilo del icono de bombilla */
+.button-with-icon::before {
+    /*content: "\1F4A1"; /* Código del emoji de bombilla */
+    font-size: 10px; /* Tamaño del icono */
+    margin-right: 10px; /* Espacio entre el icono y el texto */
+}
+
+/* Estilo del contenedor del botón */
+#tema {
+    position: absolute;
+    top: 1px; /* Ajusta la distancia desde la parte superior */
+    right: 1px; /* Ajusta la distancia desde la derecha */
+    z-index: 999; /* Asegura que esté por encima del contenido */
+}
+/* Estilos para tema oscuro en las tablas */
+body.dark-theme table {
+    background-color: #333; /* Cambia el fondo de las tablas en tema oscuro */
+    border: 1px solid #555; /* Cambia el borde de las tablas en tema oscuro */
+    color: white; /* Cambia el color del texto en las tablas en tema oscuro */
+}
+
+/* Estilos para tema oscuro en las celdas de encabezado th de las tablas */
+body.dark-theme table th {
+    background-color: #333; /* Cambia el fondo de las celdas de encabezado en tema oscuro */
+    color: white; /* Cambia el color del texto de las celdas de encabezado en tema oscuro */
+}
+
+/* Estilos para tema oscuro en las filas pares de las tablas */
+body.dark-theme table tr:nth-child(even) {
+    background-color: #444; /* Cambia el fondo de las filas pares en tema oscuro */
+}
+
+/* Estilos para tema oscuro en las filas impares de las tablas */
+body.dark-theme table tr:nth-child(odd) {
+    background-color: #333; /* Cambia el fondo de las filas impares en tema oscuro */
+}
+
+/* Resaltado de la línea seleccionada en las tablas en tema oscuro */
+body.dark-theme table tr:hover {
+    background-color: #555; /* Cambia el fondo cuando se pasa el mouse en tema oscuro */
+}
+
+/* Estilos para tema oscuro en las celdas de datos td de las tablas */
+body.dark-theme table td {
+    border: 1px solid #444; /* Cambia el borde de las celdas de datos en tema oscuro */
+}
+
+.lista-eventos {
+    max-width: 95%;
+    max-height: 200px; /* Altura máxima de la lista */
+    overflow-y: auto; /* Agrega scroll vertical cuando sea necesario */
+    border: 1px solid #ccc; /* Un borde para darle estilo */
+    padding: 2px; /* Espacio interior */
+    background-color: #f9f9f9; /* Color de fondo */
+    font-size: 8px;
+}
+
+.lista-eventos.dark-theme {
+    background-color: #000000;
+    color: #d4ff00;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid gray;
+    width: 80%; /* Establece el ancho al 80% del contenedor */
+}
+
+.highlight {
+    background: radial-gradient(circle, rgba(0, 128, 0, 0.468), rgba(7, 186, 25, 0.715));
+    transition: background-color 4s; /* Duración de la transición de 1 segundo */
+}
