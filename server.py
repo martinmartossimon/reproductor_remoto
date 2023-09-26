@@ -16,9 +16,10 @@ import datetime
 directorio = "./contenido"
 mensajes = [] # [{'accion': 'reproducir', 'video': 'FalsaPROPAGANDA.mp4', 'fecha': '2023-09-25 01:05:30'}]
 clientes_eventos = [] #Lista de objetos EventosHandler
+servidor_eventos = [] #Lista de objetos EventosHandler
 clientes = [] #Lista strings de IP de clientes
 
-
+# Deprecado
 def listar_archivos():
     try:
         archivos = [nombre for nombre in os.listdir(directorio) if nombre.endswith('.mp4')]
@@ -28,6 +29,7 @@ def listar_archivos():
     except Exception as e:
         return str(e)
 
+# Obtener Duracion del Video
 def obtener_duracion_video(ruta_archivo):
     try:
         # Utiliza el comando ffprobe para obtener la duración del video en segundos
@@ -96,13 +98,25 @@ def listar_archivos_detalle():
     except Exception as e:
         return str(e)
 
+# Descarga un video de youtube
 def descargarVideoYoutube(url):
     urlLimpia = urllib.parse.unquote(url)
     script_path = os.path.abspath('/home/tincho/Scripts/reproductor_remoto/descargadorYtb-dlp')
     try:
-        proceso = subprocess.Popen(f"sh {script_path} {urlLimpia} &", shell=True)
+        proceso = subprocess.Popen(f"sh {script_path} {urlLimpia}", shell=True)
         pid = proceso.pid
         print("PID del proceso:", pid)
+        
+        # Define una función para esperar a que el proceso se complete
+        def esperar_proceso():
+            proceso.wait()
+            print("El proceso de descarga de URL ha finalizado.")
+
+        
+        # Crea un hilo para esperar al proceso en segundo plano
+        hilo_espera = threading.Thread(target=esperar_proceso)
+        hilo_espera.start()
+        
     except subprocess.CalledProcessError as e:
         print(f"Error al ejecutar el script: {e}")
     except FileNotFoundError:
@@ -438,7 +452,14 @@ class EventosHandler(BaseHTTPRequestHandler):
                 print("********************Cliente desconectado:", str(e))
                 # Elimina al cliente de la lista cuando se desconecta
                 clientes.remove(client_ip)
-                clientes_eventos.remove(self)       
+                clientes_eventos.remove(self)
+        elif.path == '/eventosServidor':
+
+        else:
+            self.send_response(404)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write("Endpoint no encontrado".encode())
 
 def ping_clientes():
     while True:
