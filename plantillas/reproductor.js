@@ -3,14 +3,17 @@ console.log("Inicializando variables...");
 // Variables Globales
 let videoReproduciendo = ""; // identificador con el nombredelfichero.mp4
 let elementos = []; // Array donde voy a guardar el resultado al consultar el listado de Archivos de /listar_archivos_detalle
+let darkModeEnabled = false;
+
 
 // Lista de detalles de archivos
 let listaArchivos = [];
 let idSeleccionado = 0;
 
+// Elementos sobre los que vamos a tener eventos escuchando
 const button = document.getElementById('toggleButton');
-let darkModeEnabled = false;
-
+const buttonSiguiente = document.getElementById('siguiente');
+const buttonAnterior = document.getElementById('anterior');
 
 /******************
 * MOSTRAR POPUP
@@ -389,6 +392,73 @@ function getListaArchivosSinPromesa() {
         });
 }
 
+
+/****************
+ * siguiente()
+ ****************/
+function siguiente(){
+    console.log("Entrando en siguiente()");
+    // Busco la fila
+    if(videoReproduciendo != "") {
+        console.log("videoReproduciendo =" + videoReproduciendo);
+        const indiceDelReproduciendo = elementos.findIndex(elemento => elemento.archivo === videoReproduciendo);
+        const indiceEntero = parseInt(indiceDelReproduciendo); // Convierte a entero
+    
+        cantVideosEnElementos = elementos.length;
+        console.log("cantVideosEnElementos=" + cantVideosEnElementos);
+    
+        indiceDeFila = indiceEntero + 1;
+
+        if (indiceDeFila >= cantVideosEnElementos){
+            console.log("Estoy al final de la lista paso al 0");
+            indiceDeFila = 0;
+            console.log("Ahora saltaría a reproducir: " + elementos[indiceDeFila].archivo);
+            reproducirVideo(elementos[indiceDeFila].archivo);
+        } else {
+            console.log("Ahora saltaría a reproducir: " + elementos[indiceDeFila].archivo);
+            reproducirVideo(elementos[indiceDeFila].archivo);
+        }
+    } else {
+        console.log("No hay reproduciendo, luego reproduciría el primero - Indice 0");
+        indiceDeFila = 0;
+        console.log("Ahora saltaría a reproducir: " + elementos[indiceDeFila].archivo);
+        reproducirVideo(elementos[indiceDeFila].archivo);
+    }
+}
+
+/****************
+ * anterior()
+ ****************/
+function anterior(){
+    console.log("Entrando en anterior()");
+    // Busco la fila
+    if(videoReproduciendo != "") {
+        console.log("videoReproduciendo =" + videoReproduciendo);
+        const indiceDelReproduciendo = elementos.findIndex(elemento => elemento.archivo === videoReproduciendo);
+        const indiceEntero = parseInt(indiceDelReproduciendo); // Convierte a entero
+    
+        cantVideosEnElementos = elementos.length;
+        console.log("cantVideosEnElementos=" + cantVideosEnElementos);
+    
+        indiceDeFila = indiceEntero - 1;
+
+        if (indiceDeFila <= 0){
+            console.log("Estoy al inicio de la lista paso al ultimo");
+            indiceDeFila = elementos.length - 1;
+            console.log("Ahora saltaría a reproducir: " + elementos[indiceDeFila].archivo);
+            reproducirVideo(elementos[indiceDeFila].archivo);
+        } else {
+            console.log("Ahora saltaría a reproducir: " + elementos[indiceDeFila].archivo);
+            reproducirVideo(elementos[indiceDeFila].archivo);
+        }
+    } else {
+        console.log("No hay reproduciendo, luego reproduciría el ultimo de la lista - Indice: " + elementos.length -1 );
+        indiceDeFila = elementos.length - 1;
+        console.log("Ahora saltaría a reproducir: " + elementos[indiceDeFila].archivo);
+        reproducirVideo(elementos[indiceDeFila].archivo);
+    }
+}
+
 /************************************************** 
 * Listeners 
 **************************************************/
@@ -449,6 +519,15 @@ button.addEventListener('click', () => {
     }
 });
 
+/** Listener de cambio de siguiente **/
+buttonSiguiente.addEventListener('click', () => {
+    siguiente();
+}); 
+
+/** Listener de cambio de anterior **/
+buttonAnterior.addEventListener('click', () => {
+    anterior();
+}); 
 
 /***************************************
 * Manejador de mensajes con el backend
