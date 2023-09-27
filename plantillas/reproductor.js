@@ -1,7 +1,8 @@
 console.log("Arrancando el Reproductor importado en .js");
 let indiceReproduccionActual = 0;
-
-
+let videoReproduciendo = "";
+// let elementosPorArchivo = {}; // Lista que se va a sobreescribir cada vez que consulte getListaArchivos() Deprecado ya que ahora retorna un array y no un object
+let elementos = [];
 /*****************************
  * Importado del html a pelo
  **************************/
@@ -27,6 +28,37 @@ function mostrarPopup(mensaje) {
     setTimeout(function() {
         popup.style.display = "none";
     }, 1500); // 3000 milisegundos = 3 segundos
+}
+
+/*
+Agregar Eventos
+*/
+function agregarEvento(texto) {
+    const eventosDiv = document.getElementById("eventos");
+    const eventoNuevo = document.createElement("div");
+    eventoNuevo.textContent = texto;
+
+    // Agregar una barra horizontal antes del eventoNuevo (si no es el primer evento)
+    if (eventosDiv.firstChild !== null) {
+        const hrElement = document.createElement("hr");
+        eventosDiv.insertBefore(hrElement, eventosDiv.firstChild);
+    }
+
+    eventosDiv.insertBefore(eventoNuevo, eventosDiv.firstChild);
+
+    // Limitar la cantidad de eventos mostrados (por ejemplo, a 100)
+    const eventos = eventosDiv.getElementsByTagName("div");
+    if (eventos.length > 100) {
+        eventosDiv.removeChild(eventos[100]);
+    }
+
+    // Agregar la clase "highlight" al último div
+    eventoNuevo.classList.add("highlight");
+
+    // Usar setTimeout para quitar la clase después de 1 segundo
+    setTimeout(function() {
+        eventoNuevo.classList.remove("highlight");
+    }, 4000); // 1000 milisegundos = 1 segundo
 }
 
 //*******************************
@@ -175,6 +207,116 @@ function reproducirVideo(button) {
     }
 }
 
+function reproducirVideo_new(video) {
+    const tablaBody = document.getElementById('tabla-body');
+    tablaBody.innerHTML = ''; //Limpio el contenido de la tabla de reproduccion
+
+    // Preparo la request al servidor
+    const datos = {
+        accion: "reproducir",
+        video: video // Utiliza el nombre del archivo en lugar de idVideo
+    };
+    console.log("Datos: " + JSON.stringify(datos));
+    // URL del endpoint al que deseas enviar los datos
+    const endpointURL = '/reproducirVideo';
+    // Opciones de la solicitud
+    const opciones = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datos)
+    };
+    // Realiza la solicitud al servidor
+    fetch(endpointURL, opciones)
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Error en la solicitud');
+            }
+        })
+        .then(data => {
+            console.log('Respuesta del servidor:', data);
+            videoReproduciendo = video;
+            console.log("videoReproduciendo="+videoReproduciendo)
+            // Actualizo la lista
+            getListaArchivos()
+                .then(elementosPorArchivo => {
+                    // Aquí puedes acceder a elementosPorArchivo
+                    console.log("Contenido de elementosPorArchivo en funcion getListaArchivos:", elementosPorArchivo);
+                    // Genero tabla a partir del listado de archivos
+                    dibujarTablaReproduccion();
+                    // Marco el video en reproduccion
+                    marcarFilaReproduccion();
+                })
+                .catch(error => {
+                    console.error('Error al obtener la lista de detalles:', error);
+                });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    
+    
+}
+
+function dibujarTablaReproduccion() {
+    if (elementos.length > 0) {
+        console.log("Contenido de elementos en dibujarTablaReproduccion:", elementos);
+
+        const tablaReproduccion = document.getElementById('tablaListaReproduccion');
+        const tbody = tablaReproduccion.querySelector('tbody');
+        tbody.innerHTML = '';
+
+        elementos.forEach((elemento, index) => {
+            const fila = document.createElement('tr');
+            const id = index + 1;
+            fila.dataset.id = id;
+
+            const botones = document.createElement('td');
+            botones.innerHTML = `<button id="reproducir-${id}" onclick="reproducirVideo(this)">&#x25B6;</button>
+                                <button id="borrar-${id}" onclick="borrarVideo('${elemento.archivo}')">&#x1F5D1;</button>
+            `;
+
+            fila.innerHTML = `
+                <td>${id}</td>                       
+                <td>${elemento.archivo}</td>
+                ${botones.outerHTML}
+                <td>${elemento.archivo}</td>
+                <td>${elemento.tamano}</td>
+                <td>${elemento.Fecha_Creacion}</td>
+                <td>${elemento.duracion_hms}</td>
+            `;
+            tbody.appendChild(fila);
+        });
+    }
+}
+
+/*
+Marco en funcion de reproduciendo. Busco en el array el índice del nombre del archivo y marco la fila: indice + 1 como seleccionada
+*/
+function marcarFilaReproduccion(){
+    // Busco la fila
+    const indiceDelReproduciendo = elementos.findIndex(elemento => elemento.archivo === videoReproduciendo);
+    const indiceEntero = parseInt(indiceDelReproduciendo); // Convierte a entero
+
+    indiceDeFila = indiceEntero + 1;
+    if (!isNaN(indiceEntero) && indiceEntero !== -1) {
+        console.log(`El video "${videoReproduciendo}" se encuentra en el índice ${indiceDelReproduciendo} del array elementos.`);
+        console.log("Indice buscado en marcarFilaReproduccion: " + indiceDelReproduciendo + " Correspondiente al elemento de elementos[]: " + elementos[indiceDelReproduciendo] + " que en la tabla sería: " + indiceDeFila);
+
+        // Aqui ya tengo indiceDeFila que es la fila que tengo que marcar.
+        // Me posiciono en la fila de la tabla.
+        filaSeleccionadaReproduciendo = document.querySelector(`tr[data-id="${indiceDeFila}"]`);
+        // La añado a la clase seleccionada para que le aplique los estilos
+        filaSeleccionadaReproduciendo.classList.add('seleccionada');
+    } else {
+        console.log(`El video "${videoReproduciendo}" no se encontró en el array elementos.`);
+    }
+
+}
+
 /******************************** 
 * borrarVideo()
 ********************************/
@@ -264,36 +406,7 @@ function cargarClientes() {
         });
 }
 
-/*
-Agregar Eventos
-*/
-function agregarEvento(texto) {
-    const eventosDiv = document.getElementById("eventos");
-    const eventoNuevo = document.createElement("div");
-    eventoNuevo.textContent = texto;
 
-    // Agregar una barra horizontal antes del eventoNuevo (si no es el primer evento)
-    if (eventosDiv.firstChild !== null) {
-        const hrElement = document.createElement("hr");
-        eventosDiv.insertBefore(hrElement, eventosDiv.firstChild);
-    }
-
-    eventosDiv.insertBefore(eventoNuevo, eventosDiv.firstChild);
-
-    // Limitar la cantidad de eventos mostrados (por ejemplo, a 100)
-    const eventos = eventosDiv.getElementsByTagName("div");
-    if (eventos.length > 100) {
-        eventosDiv.removeChild(eventos[100]);
-    }
-
-    // Agregar la clase "highlight" al último div
-    eventoNuevo.classList.add("highlight");
-
-    // Usar setTimeout para quitar la clase después de 1 segundo
-    setTimeout(function() {
-        eventoNuevo.classList.remove("highlight");
-    }, 4000); // 1000 milisegundos = 1 segundo
-}
 
 /* 
 * Listeners 
@@ -377,6 +490,8 @@ eventSource.onmessage = function(event) {
 /******************************** 
 * actualizarListado_Detalle()
 * Recibe: [{"archivo": "13COMANDOSRAROS.mp4", "tamano": "939.55 MB", "Fecha_Creacion": "20/09/2023 13:38", "duracion_segundos": 991.747483, "duracion_hms": "00:16:31"}, {"archivo": "ConcordeJustKis.mp4", "tamano": "6.37 MB", "Fecha_Creacion": "20/09/2023 21:32", "duracion_segundos": 300.721633, "duracion_hms": "00:05:00"}]
+
+Pendiente: el reproducir en lugar de mandar this debe mandar el id del video
 ********************************/
 function actualizarListado_Detalle_Externo() {
     console.log("*********************Actualizando el listado de detalles (Funcion dentro del JS)...");
@@ -441,4 +556,27 @@ function actualizarListado_Detalle_Externo() {
         const formatoFechaHora = fechaHora.toLocaleString(); // Convierte la fecha y hora a una cadena legible
         etiquetaUpdate = document.getElementById("ultimaActualizacion");
         etiquetaUpdate.innerHTML = "Ultima actualizacion: " + formatoFechaHora;
+}
+
+// Retorna una promesa
+function getListaArchivos() {
+    return new Promise((resolve, reject) => {
+        fetch('/listar_archivos_detalle')
+            .then(response => response.json()) // Parsear la respuesta JSON
+            .then(data => {
+                // Crea un array para almacenar los elementos
+                elementos = [];
+
+                // Itera a través de los elementos y guárdalos en el array
+                data.forEach(elemento => {
+                    elementos.push(elemento);
+                });
+
+                // Resuelve la promesa con el array de elementos
+                resolve(elementos);
+            })
+            .catch(error => {
+                reject(error); // Rechaza la promesa en caso de error
+            });
+    });
 }
