@@ -371,6 +371,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             data = json.loads(data.decode('utf-8'))
             accion = data.get('accion')
             video = data.get('video')
+            print("Video recibido para reproducir: ", video)
 
             if accion == 'reproducir':
                 # Obtener la fecha y hora actual
@@ -388,7 +389,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 data = {}
                 data["fecha"] = fecha_actual_str
                 data["tipo"] = "Informativo"
-                data["mensaje"] = "Reproduciendo video: " + video
+                data["mensaje"] = "Reproduciendo video " + video
                 mensajes_servidor.append(data)
                 return
             else:

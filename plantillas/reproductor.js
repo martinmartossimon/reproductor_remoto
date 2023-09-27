@@ -1,13 +1,9 @@
 console.log("Arrancando el Reproductor importado en .js");
-let indiceReproduccionActual = 0;
-let videoReproduciendo = "";
-// let elementosPorArchivo = {}; // Lista que se va a sobreescribir cada vez que consulte getListaArchivos() Deprecado ya que ahora retorna un array y no un object
-let elementos = [];
-/*****************************
- * Importado del html a pelo
- **************************/
+console.log("Inicializando variables...");
 // Variables Globales
-let ultimaFilaMarcada = null;
+let videoReproduciendo = ""; // identificador con el nombredelfichero.mp4
+let elementos = []; // Array donde voy a guardar el resultado al consultar el listado de Archivos de /listar_archivos_detalle
+
 // Lista de detalles de archivos
 let listaArchivos = [];
 let idSeleccionado = 0;
@@ -16,9 +12,9 @@ const button = document.getElementById('toggleButton');
 let darkModeEnabled = false;
 
 
-//******************************
-//         MOSTRAR POPUP
-//******************************
+/******************
+* MOSTRAR POPUP
+*******************/
 function mostrarPopup(mensaje) {
     var popup = document.getElementById("popup");
     popup.innerText = mensaje;
@@ -30,9 +26,9 @@ function mostrarPopup(mensaje) {
     }, 1500); // 3000 milisegundos = 3 segundos
 }
 
-/*
-Agregar Eventos
-*/
+/******************
+* agregarEvento() - Agrega entrada a la lista de eventos
+******************/
 function agregarEvento(texto) {
     const eventosDiv = document.getElementById("eventos");
     const eventoNuevo = document.createElement("div");
@@ -61,9 +57,9 @@ function agregarEvento(texto) {
     }, 4000); // 1000 milisegundos = 1 segundo
 }
 
-//*******************************
-//ENVIAR DATOS PARA DESCARGAR VIDEO DE URL
-//*******************************
+/******************
+* ENVIAR DATOS PARA DESCARGAR VIDEO DE URL
+******************/
 function enviarDatos() {
     var host = window.location.host;
     var endpoint = '/urlDownloader';
@@ -77,7 +73,7 @@ function enviarDatos() {
     console.log("Json enviado: " + JSON.stringify(datos));
 
     // Realizar la solicitud HTTP POST
-    //fetch('http://localhost:8000/urlDownloader', {
+    //fetch('http://host:8000/urlDownloader', {
     fetch(url, {
         method: 'POST',
         headers: {
@@ -101,8 +97,7 @@ function enviarDatos() {
 
 /******************************** 
 * registrarCliente()
-* 
-* Deshabilitado desde esta vista ya que no es cliente
+* !! Deshabilitado !! desde esta vista ya que no es cliente
 ********************************/
 function registrarCliente(){
     console.log("Cliente Alive send")
@@ -119,95 +114,12 @@ function registrarCliente(){
     });
 }
 
-/******************************** 
+
+/***************************************
 * reproducirVideo()
-********************************/
-function reproducirVideo(button) {
-    // Limpio todas las classes seleccionada
-    const tablaBody = document.getElementById('tabla-body');
-    const filas = tablaBody.getElementsByTagName('tr');
-    for (let i = 0; i < filas.length; i++) {
-        filas[i].classList.remove('seleccionada');
-    }
-    //Cambio también la propiedad del anterior
-    idAnterior = idSeleccionado;
-    const filaValorActualizar = tablaBody.querySelector(`tr[data-id="${idAnterior}"]`);
-        if (filaValorActualizar) {
-            filaValorActualizar.style.backgroundColor = "";
-            //filaValorActualizar.classList.add('seleccionado')
-            //console.log("/listar_archivos - valor de filaValorActualizar:" + filaValorActualizar);
-            filaValorActualizar.querySelector('button:nth-child(2)').disabled = false
-        }
-
-    // Obtener la fila seleccionada
-    const fila = button.closest('tr');
-    const idFila = fila.dataset.id;
-
-    console.log(`Reproducir video con ID: ${idFila}`);
-
-    // Buscar el archivo correspondiente en la lista de archivos
-    const archivoSeleccionado = listaArchivos.find(archivo => archivo.id === Number(idFila));
-
-    if (archivoSeleccionado) {
-        const nombreArchivo = archivoSeleccionado.nombre;
-
-        // Aquí puedes agregar el código para reproducir el video según el nombre del archivo
-        // Datos que quieres enviar en formato JSON
-        const datos = {
-            accion: "reproducir",
-            video: nombreArchivo // Utiliza el nombre del archivo en lugar de idVideo
-        };
-        console.log("Datos: " + JSON.stringify(datos));
-
-        // URL del endpoint al que deseas enviar los datos
-        const endpointURL = '/reproducirVideo';
-
-        // Opciones de la solicitud
-        const opciones = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datos)
-        };
-
-        // Realiza la solicitud al servidor
-        fetch(endpointURL, opciones)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Error en la solicitud');
-                }
-            })
-            .then(data => {
-                console.log('Respuesta del servidor:', data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-
-        // Marcar la fila en verde
-        fila.classList.add('seleccionada');
-        idSeleccionado = idFila
-        console.log("Elemento (en reproducir) idSeleccionado: " + idSeleccionado);
-        console.log("Lista: " + listaArchivos);
-
-        // Actualizar el detalle de Reproduciendo
-        spanReproduciendo = document.getElementById("reproduciendo")
-        spanReproduciendo.innerHTML="Reproduciendo: "+ archivoSeleccionado.nombre;
-
-        // Deshabilitar el botón de "Borrar"
-        //
-        const idBotonBorrar = `borrar-${idSeleccionado}`;
-        const botonBorrar = document.getElementById(idBotonBorrar);
-        if (botonBorrar) {
-            botonBorrar.disabled = true;
-        }
-    }
-}
-
-function reproducirVideo_new(video) {
+* Envía un JSON con este formato al backend: JSON - {"accion":"reproducir","video":"T10x7Feijooenel.mp4"}
+************************************/
+function reproducirVideo(video) {
     const tablaBody = document.getElementById('tabla-body');
     tablaBody.innerHTML = ''; //Limpio el contenido de la tabla de reproduccion
 
@@ -261,6 +173,10 @@ function reproducirVideo_new(video) {
     
 }
 
+/******************
+* Función que dibuja la tabla con la lista de elementos de video reproducibles, con sus correspondientes botones
+* Requiere que elementos[] tenga data para pintar
+******************/
 function dibujarTablaReproduccion() {
     if (elementos.length > 0) {
         console.log("Contenido de elementos en dibujarTablaReproduccion:", elementos);
@@ -275,7 +191,7 @@ function dibujarTablaReproduccion() {
             fila.dataset.id = id;
 
             const botones = document.createElement('td');
-            botones.innerHTML = `<button id="reproducir-${id}" onclick="reproducirVideo(this)">&#x25B6;</button>
+            botones.innerHTML = `<button id="reproducir-${id}" onclick="reproducirVideo('${elemento.archivo}')">&#x25B6;</button>
                                 <button id="borrar-${id}" onclick="borrarVideo('${elemento.archivo}')">&#x1F5D1;</button>
             `;
 
@@ -293,9 +209,10 @@ function dibujarTablaReproduccion() {
     }
 }
 
-/*
-Marco en funcion de reproduciendo. Busco en el array el índice del nombre del archivo y marco la fila: indice + 1 como seleccionada
-*/
+/***************************************
+* marcarFilaReproduccion()
+* Marco en funcion de reproduciendo. Busco en el array el índice del nombre del archivo y marco la fila: indice + 1 como seleccionada
+************************************/
 function marcarFilaReproduccion(){
     // Busco la fila
     const indiceDelReproduciendo = elementos.findIndex(elemento => elemento.archivo === videoReproduciendo);
@@ -311,16 +228,32 @@ function marcarFilaReproduccion(){
         filaSeleccionadaReproduciendo = document.querySelector(`tr[data-id="${indiceDeFila}"]`);
         // La añado a la clase seleccionada para que le aplique los estilos
         filaSeleccionadaReproduciendo.classList.add('seleccionada');
+
+        //Compruebo la parte del tema oscuro para que también le añada la clase dark-theme
+        if (darkModeEnabled) {
+            filaSeleccionadaReproduciendo.classList.add('dark-theme');
+        }
+
+        // Deshabilito solo boton borrar
+        const botonBorrar = filaSeleccionadaReproduciendo.querySelector('#borrar-' + indiceDeFila);
+        botonBorrar.disabled = true;
+
+        //Deshabilito los 2 o + botones:
+        // Obtener los botones dentro de la fila
+        //const botones = filaSeleccionadaReproduciendo.querySelectorAll('button');
+        //// Deshabilitar los 2 botones
+        //botones.forEach(boton => {
+        //    boton.disabled = true;
+        //});
     } else {
         console.log(`El video "${videoReproduciendo}" no se encontró en el array elementos.`);
     }
-
 }
 
 /******************************** 
 * borrarVideo()
 ********************************/
-function borrarVideo(idVideo, boton) {
+function borrarVideo(idVideo) {
     console.log(`Borrar video con ID: ${idVideo}`);
     // Aquí puedes agregar el código para borrar el video según el ID proporcionado
     const nombreVideoABorrar = idVideo; // Cambia esto al nombre del video que deseas borrar
@@ -337,15 +270,7 @@ function borrarVideo(idVideo, boton) {
     .then(response => response.json())
     .then(data => {
         console.log(data);
-        //actualizarListado();
-        //actualizarListado_Detalle();
-        actualizarListado_Detalle_Externo()
-        //boton.disabled = true;
-        //var fila = boton.closest('tr');
-        //if (fila) {
-            // Elimina la fila de la tabla
-        //    fila.remove();
-        //}
+        actualizarListaVideos();
     })
     .catch(error => {
         console.error('Error:', error);
@@ -354,8 +279,8 @@ function borrarVideo(idVideo, boton) {
 
 /******************************** 
 * cargarClientes()
+* Función para cargar la lista de clientes desde el backend
 ********************************/
-// Función para cargar la lista de clientes desde el servidor
 function cargarClientes() {
     console.log("ejecuto cargarClientes()");
     // Obtén la dirección IP del host
@@ -406,159 +331,18 @@ function cargarClientes() {
         });
 }
 
-
-
-/* 
-* Listeners 
-*/
-document.getElementById('enviar').addEventListener('click', enviarDatos);
-document.addEventListener("DOMContentLoaded", function() {
-    //setInterval(actualizarListado, 15000); // 5000 milisegundos = 5 segundos
-    //setInterval(actualizarListado_Detalle, 15000); // 5000 milisegundos = 5 segundos
-    setInterval(actualizarListado_Detalle_Externo, 15000); // 5000 milisegundos = 5 segundos
-    setInterval(cargarClientes, 15000); // 5000 milisegundos = 5 segundos
-    //setInterval(registrarCliente, 2000);
-    //actualizarListado();
-    //actualizarListado_Detalle();
-    actualizarListado_Detalle_Externo();
-    //registrarCliente();
-});
-/*
-* Listener de cambio de tema
-*/
-button.addEventListener('click', () => {
-    darkModeEnabled = !darkModeEnabled; // Alternar entre temas oscuro y claro
-    const body = document.body;
-    const eventos = document.getElementById
-
-    if (darkModeEnabled) {
-        document.body.style.backgroundColor = '#333'; // Cambia el fondo a un color oscuro
-        document.body.style.color = '#fff'; // Cambia el color del texto a blanco
-
-        body.classList.add('dark-theme'); // Agregar la clase 'dark-theme' al cuerpo
-        document.getElementById("eventos").classList.add("dark-theme");
-        console.log('Tema oscuro activado');
-        button.innerHTML = '<span>&#x1F4A1;</span> Encender';
-
-        // Aplicar tema oscuro a las tablas con identificadores específicos
-        const tables = document.querySelectorAll('#tablaListaReproduccion, #tablaClientes');
-        tables.forEach(table => {
-            table.classList.add('dark-theme'); // Agregar clase 'dark-theme' a las tablas
-        });
-    } else {
-        document.body.style.backgroundColor = '#ffffff'; // Cambia el fondo a un color oscuro
-        document.body.style.color = '#000000'; // Cambia el color del texto a blanco
-
-        body.classList.remove('dark-theme'); // Eliminar la clase 'dark-theme' del cuerpo
-        document.getElementById("eventos").classList.remove("dark-theme");
-        console.log('Tema claro activado');
-        button.innerHTML = '<span>&#x1F4A1;</span> Apagar';
-        // Restaurar estilos anteriores del botón aquí si es necesario
-
-        // Restaurar tema claro en las tablas con identificadores específicos
-        const tables = document.querySelectorAll('#tablaListaReproduccion, #tablaClientes');
-        tables.forEach(table => {
-            table.classList.remove('dark-theme'); // Eliminar clase 'dark-theme' de las tablas
-        });
-    }
-});
-
-/***************************************
-* Manejador de mensajes con el backend
-***************************************/
-var host = window.location.hostname;
-var endpoint = '/eventosServidor';
-var url = 'http://' + host + ":8001" + endpoint;
-const eventSource = new EventSource(url);
-//const eventSource = new EventSource('http://localhost:8001/eventos');
-
-// Maneja eventos recibidos del servidor
-eventSource.onmessage = function(event) {
-    const data = JSON.parse(event.data);
-    //console.log("Recibido mensaje!: " + data);
-    console.log("Recibido mensaje del backend:", JSON.stringify(data, null, 2));
-
-    agregarEvento(data.fecha + " - " + data.mensaje);
-};
-
-
-
-
-/* Fin del importado del html */
-
-
-/******************************** 
-* actualizarListado_Detalle()
-* Recibe: [{"archivo": "13COMANDOSRAROS.mp4", "tamano": "939.55 MB", "Fecha_Creacion": "20/09/2023 13:38", "duracion_segundos": 991.747483, "duracion_hms": "00:16:31"}, {"archivo": "ConcordeJustKis.mp4", "tamano": "6.37 MB", "Fecha_Creacion": "20/09/2023 21:32", "duracion_segundos": 300.721633, "duracion_hms": "00:05:00"}]
-
-Pendiente: el reproducir en lugar de mandar this debe mandar el id del video
-********************************/
-function actualizarListado_Detalle_Externo() {
-    console.log("*********************Actualizando el listado de detalles (Funcion dentro del JS)...");
-
-    fetch('/listar_archivos_detalle')
-        .then(response => response.json()) // Parsear la respuesta JSON
-        .then(data => {
-            console.log("Data recibida: " + data);
-            // Obtén la tabla existente
-            const tablaReproduccion = document.getElementById('tablaListaReproduccion');
-            const tbody = tablaReproduccion.querySelector('tbody');
-            tbody.innerHTML = '';
-        
-            // Iterar sobre la lista de detalles y construir las filas
-            data.forEach((detalle, index) => {
-
-
-                const fila = document.createElement('tr');
-                const id = index + 1;
-                //fila.dataset.id = id;
-                fila.dataset.id = index + 1;
-
-                // Agregar detalles a la lista
-                listaArchivos.push({ id, nombre: detalle.archivo });
-
-                // Botones de Reproducción y Borrar
-                const botones = document.createElement('td');
-                botones.innerHTML = `
-                    <button id="reproducir-${id}" onclick="reproducirVideo(this)">&#x25B6;</button>
-                    <button id="borrar-${id}" onclick="borrarVideo('${detalle.archivo}', this)">&#x1F5D1;</button>
-                `;
-
-                fila.innerHTML = `
-                    <td>${id}</td>                       
-                    <td>${detalle.archivo}</td>
-                    ${botones.outerHTML}
-                    <td>${detalle.archivo}</td>
-                    <td>${detalle.tamano}</td>
-                    <td>${detalle.Fecha_Creacion}</td>
-                    <td>${detalle.duracion_hms}</td>
-                `;
-
-                tbody.appendChild(fila);
-
-                // Pinto la fila de reproduciendo y deshabilito el boton
-                const filaValorActualizar = tbody.querySelector(`tr[data-id="${idSeleccionado}"]`);
-                if (filaValorActualizar) {
-                    filaValorActualizar.style.backgroundColor = "lime";
-                    filaValorActualizar.classList.add('seleccionado')
-                    console.log("/listar_archivos - valor de filaValorActualizar:" + filaValorActualizar);
-                    const botonBorrar = filaValorActualizar.querySelector('button:nth-child(2)'); // Suponiendo que el botón de "Borrar" es el segundo botón en la fila
-                    if (botonBorrar) {
-                        botonBorrar.disabled = true;
-                    }
-                }
-            });
-        })
-        .catch(error => {
-            console.error('Error al obtener la lista de detalles:', error);
-        });
-        const fechaHora = new Date(); // Obtiene la fecha y hora actual
-        const formatoFechaHora = fechaHora.toLocaleString(); // Convierte la fecha y hora a una cadena legible
-        etiquetaUpdate = document.getElementById("ultimaActualizacion");
-        etiquetaUpdate.innerHTML = "Ultima actualizacion: " + formatoFechaHora;
+/* actualizarListaVideos = getListaArchivos + dibujarTablaReproduccion +  marcarFilaReproduccion*/
+function actualizarListaVideos(){
+    getListaArchivos();
+    dibujarTablaReproduccion();
+    marcarFilaReproduccion();
 }
 
-// Retorna una promesa
+
+/* getListaArchivos() 
+* Recive: [{"archivo": "13COMANDOSRAROS.mp4", "tamano": "939.55 MB", "Fecha_Creacion": "20/09/2023 13:38", "duracion_segundos": 991.747483, "duracion_hms": "00:16:31"}, {"archivo": "ConcordeJustKis.mp4", "tamano": "6.37 MB", "Fecha_Creacion": "20/09/2023 21:32", "duracion_segundos": 300.721633, "duracion_hms": "00:05:00"}]
+* Retorna una promesa.
+*/
 function getListaArchivos() {
     return new Promise((resolve, reject) => {
         fetch('/listar_archivos_detalle')
@@ -580,3 +364,100 @@ function getListaArchivos() {
             });
     });
 }
+
+/* 
+* getListaArchivosSinPromesa() 
+*/
+function getListaArchivosSinPromesa() {
+    fetch('/listar_archivos_detalle')
+        .then(response => response.json()) // Parsear la respuesta JSON
+        .then(data => {
+            // Crea un array para almacenar los elementos
+            elementos = [];
+
+            // Itera a través de los elementos y guárdalos en el array
+            data.forEach(elemento => {
+                elementos.push(elemento);
+            });
+        })
+        .catch(error => {
+            reject(error); // Rechaza la promesa en caso de error
+        });
+}
+
+/************************************************** 
+* Listeners 
+**************************************************/
+document.getElementById('enviar').addEventListener('click', enviarDatos);
+document.addEventListener("DOMContentLoaded", function() {
+    actualizarListaVideos();
+    setInterval(actualizarListaVideos, 5000); // 5000 milisegundos = 5 segundos
+    setInterval(cargarClientes, 15000); // 5000 milisegundos = 5 segundos
+    
+});
+
+
+/** Listener de cambio de tema **/
+button.addEventListener('click', () => {
+    darkModeEnabled = !darkModeEnabled; // Alternar entre temas oscuro y claro
+    const body = document.body;
+    const eventos = document.getElementById
+
+    if (darkModeEnabled) {
+        document.body.style.backgroundColor = '#333'; // Cambia el fondo a un color oscuro
+        document.body.style.color = '#fff'; // Cambia el color del texto a blanco
+
+        body.classList.add('dark-theme'); // Agregar la clase 'dark-theme' al cuerpo
+        document.getElementById("eventos").classList.add("dark-theme");
+        console.log('Tema oscuro activado');
+        button.innerHTML = '<span>&#x1F4A1;</span> Encender';
+
+        // Aplicar tema oscuro a las tablas con identificadores específicos
+        const tables = document.querySelectorAll('#tablaListaReproduccion, #tablaClientes');
+        tables.forEach(table => {
+            table.classList.add('dark-theme'); // Agregar clase 'dark-theme' a las tablas
+        });
+
+        const elementosSeleccionados = document.querySelectorAll('.seleccionada');
+        elementosSeleccionados.forEach(elemento => {
+            elemento.classList.add('dark-theme');
+        });
+    } else {
+        document.body.style.backgroundColor = '#ffffff'; // Cambia el fondo a un color oscuro
+        document.body.style.color = '#000000'; // Cambia el color del texto a blanco
+
+        body.classList.remove('dark-theme'); // Eliminar la clase 'dark-theme' del cuerpo
+        document.getElementById("eventos").classList.remove("dark-theme");
+        console.log('Tema claro activado');
+        button.innerHTML = '<span>&#x1F4A1;</span> Apagar';
+        // Restaurar estilos anteriores del botón aquí si es necesario
+
+        // Restaurar tema claro en las tablas con identificadores específicos
+        const tables = document.querySelectorAll('#tablaListaReproduccion, #tablaClientes');
+        tables.forEach(table => {
+            table.classList.remove('dark-theme'); // Eliminar clase 'dark-theme' de las tablas
+        });
+
+        const elementosSeleccionados = document.querySelectorAll('.seleccionada');
+        elementosSeleccionados.forEach(elemento => {
+            elemento.classList.remove('dark-theme');
+        });
+    }
+});
+
+
+/***************************************
+* Manejador de mensajes con el backend
+***************************************/
+var host = window.location.hostname;
+var endpoint = '/eventosServidor';
+var url = 'http://' + host + ":8001" + endpoint;
+const eventSource = new EventSource(url);
+
+// Maneja eventos recibidos del servidor
+eventSource.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    //console.log("Recibido mensaje!: " + data);
+    console.log("Recibido mensaje del backend:", JSON.stringify(data, null, 2));
+    agregarEvento(data.fecha + " - " + data.mensaje);
+};

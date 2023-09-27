@@ -57,6 +57,17 @@ body.dark-theme .seleccionado button {
     cursor: not-allowed;
 }
 
+/* Estilos para el modo oscuro */
+body.dark-theme .seleccionada {
+    background-color: rgba(0, 255, 4, 0.234) !important; /* Cambia el fondo a un color oscuro */
+    color: white; /* Cambia el color del texto a blanco */
+}
+
+body.dark-theme .seleccionada button {
+    color: rgba(9, 126, 17, 0.778); /* Cambia el color del texto de los botones a un tono más claro */
+    cursor: not-allowed;
+}
+
 /* Contenido principal */
 .contenido {
     display: grid;
@@ -117,7 +128,7 @@ td {
 }
 
 .seleccionada button {
-    color: rgb(0, 0, 0);
+    color: rgba(9, 126, 17, 0.778);
     cursor: not-allowed;
 }
 
