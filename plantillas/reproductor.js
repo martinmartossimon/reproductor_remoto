@@ -207,6 +207,10 @@ function dibujarTablaReproduccion() {
             tbody.appendChild(fila);
         });
     }
+    const fechaHora = new Date(); // Obtiene la fecha y hora actual
+    const formatoFechaHora = fechaHora.toLocaleString(); // Convierte la fecha y hora a una cadena legible
+    etiquetaUpdate = document.getElementById("ultimaActualizacion");
+    etiquetaUpdate.innerHTML = "<p>Ultima actualizacion: " + formatoFechaHora + "</p>";
 }
 
 /***************************************

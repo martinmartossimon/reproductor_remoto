@@ -15,3 +15,4 @@ Los videos son reproucidos (y almacenados) desde el propio host de la aplicació
 - Sincronizar video en los reproductores. (Ver si se puede usar el tema de la latencia para que la sincronización sea más fina)
 - Mejorar el mover del script de descarga para que no renombre los *,part sólo los *.mp4 y así poder tener descargas simultáneas (Ver posibilidad de leer el porcentaje de descarga para enviar al servidor de alguna manera)
 - Avanzar y Retroceder la reproducción en intervalos de 30 segundos (configurable). Sólo enviando al cliente un mensaje, sin considerar el segundo actual en el cliente (unidireccional, del backend al cliente)
+- Visor de twitch. Stream a un archivo y enviar ese archivo a reproducir.
