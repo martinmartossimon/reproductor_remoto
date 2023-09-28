@@ -615,6 +615,12 @@ button.addEventListener('click', () => {
         elementosSeleccionados.forEach(elemento => {
             elemento.classList.add('dark-theme');
         });
+
+        // Aplicar clase 'button-oscuro' a todos los botones
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.classList.add('button-oscuro');
+        });
     } else {
         document.body.style.backgroundColor = '#ffffff'; // Cambia el fondo a un color oscuro
         document.body.style.color = '#000000'; // Cambia el color del texto a blanco
@@ -634,6 +640,12 @@ button.addEventListener('click', () => {
         const elementosSeleccionados = document.querySelectorAll('.seleccionada');
         elementosSeleccionados.forEach(elemento => {
             elemento.classList.remove('dark-theme');
+        });
+        
+        // Eliminar clase 'button-oscuro' de todos los botones
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.classList.remove('button-oscuro');
         });
     }
 });

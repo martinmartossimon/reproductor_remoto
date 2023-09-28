@@ -264,7 +264,7 @@ body.dark-theme .detalleActualizacion {
 }
 
 .input-personalizado {
-    border: 2px solid rgba(29, 14, 146, 0.557);; /* Color de borde verde */
+    border: 2px solid rgba(29, 14, 146, 0.557); /* Color de borde verde */
     border-radius: 10px; /* Bordes redondeados */
     padding: 2px; /* Espacio interno para el texto */
     width: 200px; /* Ancho del input */
@@ -301,3 +301,39 @@ body.dark-theme .input-personalizado {
 body.dark-theme .input-personalizado:focus {
     box-shadow: 0 0 5px #00cc00; /* Cambia la sombra al enfocar en modo oscuro */
 }
+
+
+/* Estilos para el tema claro */
+/* Botones con fondo transparente y borde azul */
+.button-claro {
+    background-color: transparent;
+    border: 2px solid rgba(29, 14, 146, 0.557); /* Color azul */
+    border-radius: 5px; /* Bordes redondeados */
+    color: rgba(29, 14, 146, 0.557); /* Color del texto */
+    padding: 2px 5px; /* Espaciado interno */
+    cursor: pointer; /* Cambia el cursor al pasar el mouse */
+    transition: background-color 0.3s, color 0.3s; /* Transición suave al cambiar colores */
+  }
+  
+  /* Estilos para el tema oscuro */
+  /* Botones con fondo transparente y borde verde */
+  .button-oscuro {
+    background-color: transparent;
+    border: 2px solid #28A745; /* Color verde */
+    border-radius: 5px; /* Bordes redondeados */
+    color: #28A745; /* Color del texto */
+    padding: 2px 5px; /* Espaciado interno */
+    cursor: pointer; /* Cambia el cursor al pasar el mouse */
+    transition: background-color 0.3s, color 0.3s; /* Transición suave al cambiar colores */
+  }
+  
+  /* Cambiar colores al pasar el mouse */
+  .button-claro:hover {
+    background-color: #007BFF; /* Fondo azul al pasar el mouse */
+    color: #fff; /* Texto blanco al pasar el mouse */
+  }
+  
+  .button-oscuro:hover {
+    background-color: #28A745; /* Fondo verde al pasar el mouse */
+    color: #fff; /* Texto blanco al pasar el mouse */
+  }
