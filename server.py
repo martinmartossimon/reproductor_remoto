@@ -353,7 +353,6 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             print("Respuesta de /getVideoReproduciendo", json_respuesta.encode('utf-8'))
             self.wfile.write(json_respuesta.encode('utf-8'))
-
         # Endpoint no encontrado
         else:
             self.send_response(404)
@@ -466,6 +465,33 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                     self.send_header('Content-type', 'application/json')
                     self.end_headers()
                     self.wfile.write(json.dumps({"error": "Debe proporcionar el nombre del video a borrar"}).encode('utf-8'))
+            except json.JSONDecodeError:
+                self.send_response(400)  # Devuelve un código de respuesta 400 si los datos no son JSON válidos
+                self.send_header('Content-type', 'text/plain')
+                self.end_headers()
+                self.wfile.write("Datos JSON no válidos".encode())
+        # Control de flujo
+        elif self.path == '/controlDeFlujo':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode())
+                accion = data.get('control')
+                print("/controlDeFlujo accion: ", accion)
+                # Obtener la fecha y hora actual
+                fecha_actual = datetime.datetime.now()
+                # Formatear la fecha y hora como una cadena
+                fecha_actual_str = fecha_actual.strftime("%Y-%m-%d %H:%M:%S")
+                dataClientes = {}
+                dataClientes["fecha"] = fecha_actual_str
+                dataClientes["control"] = accion
+                mensajes.append(dataClientes)
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"mensaje": "Accion enviada a los clientes"}).encode('utf-8'))
+                return
+
             except json.JSONDecodeError:
                 self.send_response(400)  # Devuelve un código de respuesta 400 si los datos no son JSON válidos
                 self.send_header('Content-type', 'text/plain')

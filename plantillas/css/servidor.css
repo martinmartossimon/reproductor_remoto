@@ -141,6 +141,20 @@ td {
     font-size: 10px;
 }
 
+/* Aplica un ancho máximo para la tabla y centra su contenido */
+#tableControlesReproduccion {
+    max-width: 100%; /* Establece el ancho máximo en función del contenedor */
+    margin: 0 auto; /* Centra la tabla horizontalmente */
+  }
+  
+  /* Ajusta la alineación y el espaciado de las celdas de la tabla */
+  #tableControlesReproduccion td {
+    white-space: nowrap; /* Evita el desbordamiento del contenido */
+    padding: 5px, 5px; /* Espaciado interno de las celdas */
+    text-align: center; /* Alinea el contenido al centro */
+    /*border: 1px solid #ddd; /* Agrega bordes para separar las celdas */
+  }
+
 /* Popup */
 .popup {
     display: none;

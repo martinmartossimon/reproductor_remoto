@@ -67,6 +67,84 @@
                 // Reproduce el video utilizando el nombre recibido
                 reproducirVideo(videoNombre);
             }
+
+            if (data.control === "+30" ){
+                console.log("Incremento la reproduccion en 30 segundos");
+                // Obtener la duración total del video en segundos
+                const duracionTotal = videoPlayer.duration;
+                // Obtener el segundo de reproducción actual
+                const segundoActual = videoPlayer.currentTime;
+                // Calcular el nuevo segundo de reproducción sumando 30 segundos
+                const nuevoSegundo = segundoActual + 30;
+                if (nuevoSegundo < duracionTotal) {
+                    // Establecer el nuevo segundo de reproducción
+                    videoPlayer.currentTime = nuevoSegundo;
+                    // Reproducir el video desde el nuevo segundo
+                    videoPlayer.play();
+                } else {
+                    // El nuevo segundo excede la duración del video, por lo que no hacemos nada o manejamos el caso según tus necesidades.
+                    console.log('El nuevo segundo excede la duración del video.');
+                }
+            }
+
+            if (data.control === "-30" ){
+                console.log("Decremento la reproduccion en 30 segundos");
+                // Obtener la duración total del video en segundos
+                const duracionTotal = videoPlayer.duration;
+                // Obtener el segundo de reproducción actual
+                const segundoActual = videoPlayer.currentTime;
+                // Calcular el nuevo segundo de reproducción sumando 30 segundos
+                const nuevoSegundo = segundoActual - 30;
+                if (nuevoSegundo >= 0) {
+                    // Establecer el nuevo segundo de reproducción
+                    videoPlayer.currentTime = nuevoSegundo;
+                    // Reproducir el video desde el nuevo segundo
+                    videoPlayer.play();
+                } else {
+                    // El nuevo segundo excede la duración del video, por lo que no hacemos nada o manejamos el caso según tus necesidades.
+                    videoPlayer.currentTime = 0;
+                    console.log('El nuevo segundo es anterior a 0 la duración del video.');
+                }
+            }
+
+            if (data.control === "+60" ){
+                console.log("Incremento la reproduccion en 60 segundos");
+                // Obtener la duración total del video en segundos
+                const duracionTotal = videoPlayer.duration;
+                // Obtener el segundo de reproducción actual
+                const segundoActual = videoPlayer.currentTime;
+                // Calcular el nuevo segundo de reproducción sumando 30 segundos
+                const nuevoSegundo = segundoActual + 60;
+                if (nuevoSegundo < duracionTotal) {
+                    // Establecer el nuevo segundo de reproducción
+                    videoPlayer.currentTime = nuevoSegundo;
+                    // Reproducir el video desde el nuevo segundo
+                    videoPlayer.play();
+                } else {
+                    // El nuevo segundo excede la duración del video, por lo que no hacemos nada o manejamos el caso según tus necesidades.
+                    console.log('El nuevo segundo excede la duración del video.');
+                }
+            }
+
+            if (data.control === "-60" ){
+                console.log("Decremento la reproduccion en 60 segundos");
+                // Obtener la duración total del video en segundos
+                const duracionTotal = videoPlayer.duration;
+                // Obtener el segundo de reproducción actual
+                const segundoActual = videoPlayer.currentTime;
+                // Calcular el nuevo segundo de reproducción sumando 30 segundos
+                const nuevoSegundo = segundoActual - 60;
+                if (nuevoSegundo >= 0) {
+                    // Establecer el nuevo segundo de reproducción
+                    videoPlayer.currentTime = nuevoSegundo;
+                    // Reproducir el video desde el nuevo segundo
+                    videoPlayer.play();
+                } else {
+                    // El nuevo segundo excede la duración del video, por lo que no hacemos nada o manejamos el caso según tus necesidades.
+                    videoPlayer.currentTime = 0;
+                    console.log('El nuevo segundo es anterior a 0 la duración del video.');
+                }
+            }
         };
 
         /******************************** 

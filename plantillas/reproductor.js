@@ -16,6 +16,8 @@ const buttonSiguiente = document.getElementById('siguiente');
 const buttonAnterior = document.getElementById('anterior');
 const buttonAtrasar30s = document.getElementById('atrasar30s');
 const buttonAdelantar30s = document.getElementById('adelantar30s');
+const buttonAtrasar60s = document.getElementById('atrasar60s');
+const buttonAdelantar60s = document.getElementById('adelantar60s');
 
 /******************
 * MOSTRAR POPUP
@@ -465,6 +467,7 @@ function anterior(){
  * avanzar30()
  ****************/
 function avanzar30(){
+    gestionDeFlujoReproduccion("+30");
     console.log("Avanzando 30 segundos");
 }
 
@@ -472,6 +475,23 @@ function avanzar30(){
  * retroceder30()
  ****************/
 function retroceder30(){
+    gestionDeFlujoReproduccion("-30");
+    console.log("Retrocedo 30 segundos");
+}
+
+/****************
+ * avanzar60()
+ ****************/
+ function avanzar60(){
+    gestionDeFlujoReproduccion("+60");
+    console.log("Avanzando 30 segundos");
+}
+
+/****************
+ * retroceder60()
+ ****************/
+function retroceder60(){
+    gestionDeFlujoReproduccion("-60");
     console.log("Retrocedo 30 segundos");
 }
 
@@ -515,6 +535,40 @@ function obtenerFechaYHora() {
   
     return fechaYHora;
   }
+
+function gestionDeFlujoReproduccion(accion){
+//accion pueden ser "+30", "-30", "+60", "-60"
+    const datos = {control: accion};
+    const jsonDatos = JSON.stringify(datos);
+    console.log("JSON de control de flujo: " + jsonDatos);
+
+    // Paso 3: Enviar la cadena JSON al servidor usando fetch
+    const endpointURL = "/controlDeFlujo"; // Reemplaza esto con la URL de tu endpoint
+    const opciones = {
+    method: "POST", // Método HTTP (puede ser POST, GET, PUT, etc., según tu necesidad)
+    headers: {
+        "Content-Type": "application/json" // Tipo de contenido para indicar que estás enviando JSON
+    },
+    body: jsonDatos // Los datos JSON que deseas enviar
+    };
+
+    fetch(endpointURL, opciones)
+    .then(response => {
+        if (response.ok) {
+        return response.json(); // Si la respuesta es exitosa, puedes parsear la respuesta JSON si es necesario
+        } else {
+        throw new Error("Error al enviar datos al servidor");
+        }
+    })
+    .then(data => {
+        // Aquí puedes manejar la respuesta del servidor si es necesario
+        console.log("Respuesta del servidor:", data);
+    })
+    .catch(error => {
+        // Manejar errores, por ejemplo, si la solicitud no pudo completarse
+        console.error("Error:", error);
+    });
+}
 
 /****************
  * init()
@@ -602,7 +656,17 @@ buttonAdelantar30s.addEventListener('click', () => {
 /** Listener de cambio de anterior **/
 buttonAtrasar30s.addEventListener('click', () => {
     retroceder30();
+});
+
+/** Listener de cambio de anterior **/
+buttonAdelantar60s.addEventListener('click', () => {
+    avanzar60();
 }); 
+
+/** Listener de cambio de anterior **/
+buttonAtrasar60s.addEventListener('click', () => {
+    retroceder60();
+});
 
 /***************************************
 * Manejador de mensajes con el backend
