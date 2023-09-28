@@ -6,25 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="titulo">Visor</title>
     <style>
-        body {
+       body {
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh; /* Asegura que el contenido ocupe al menos el 100% de la altura de la ventana */
-            background-color: #f0f0f0; /* Cambia el color de fondo si lo deseas */
+            min-height: 100vh;
+            background-color: #f0f0f0;
         }
 
         .contenedor {
             background-color: black;
-            text-align: center; /* Centra el contenido dentro del contenedor */
+            text-align: center;
+        }
+
+        .video-container {
+            max-width: 100%; /* Establece el ancho máximo para el video */
+            max-height: 80vh; /* Establece la altura máxima para el video */
+            overflow: hidden; /* Oculta cualquier desbordamiento del video */
+            margin: 0 auto;
         }
 
         .video {
             width: 100%;
-            max-width: 100%; /* Asegura que el video no sea más ancho que el contenedor */
-            height: auto;
+            height: 100%;
+            object-fit: contain; /* Ajusta el video al contenedor sin cortar */
         }
     </style>
 </head>

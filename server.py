@@ -19,6 +19,7 @@ mensajes_servidor = []
 clientes_eventos = [] #Lista de objetos EventosHandler
 servidor_eventos = [] #Lista de objetos EventosHandler
 clientes = [] #Lista strings de IP de clientes
+videoEnReproduccion=""
 
 # Deprecado
 def listar_archivos():
@@ -335,6 +336,24 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             # Ahora puedes enviar 'json_string' al cliente
             #print(json_string.encode('utf-8'))
             self.wfile.write(json_string.encode('utf-8'))
+        # Retorna si existe algun video en reproduccion para actualizar el servidor
+        elif self.path == '/getVideoReproduciendo':
+            print("Valor de videoEnReproduccion: ", videoEnReproduccion)
+            respuesta = {}
+            if videoEnReproduccion != "":
+                print("Existe un video en reproduccion: " + videoEnReproduccion)
+                respuesta["video"] = videoEnReproduccion
+            else:
+                print("NO EXISTE un video en reproduccion")
+                respuesta["video"] = ""
+
+            json_respuesta = json.dumps(respuesta)
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            print("Respuesta de /getVideoReproduciendo", json_respuesta.encode('utf-8'))
+            self.wfile.write(json_respuesta.encode('utf-8'))
+
         # Endpoint no encontrado
         else:
             self.send_response(404)
@@ -371,7 +390,10 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             data = json.loads(data.decode('utf-8'))
             accion = data.get('accion')
             video = data.get('video')
-            print("Video recibido para reproducir: ", video)
+            #print("Video recibido para reproducir: ", video)
+            global videoEnReproduccion  # Declarar videoEnReproduccion como global
+            videoEnReproduccion = video
+            #print("Establezco videoEnReproduccion: " + videoEnReproduccion)
 
             if accion == 'reproducir':
                 # Obtener la fecha y hora actual

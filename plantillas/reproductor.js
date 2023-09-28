@@ -14,6 +14,8 @@ let idSeleccionado = 0;
 const button = document.getElementById('toggleButton');
 const buttonSiguiente = document.getElementById('siguiente');
 const buttonAnterior = document.getElementById('anterior');
+const buttonAtrasar30s = document.getElementById('atrasar30s');
+const buttonAdelantar30s = document.getElementById('adelantar30s');
 
 /******************
 * MOSTRAR POPUP
@@ -459,17 +461,80 @@ function anterior(){
     }
 }
 
+/****************
+ * avanzar30()
+ ****************/
+function avanzar30(){
+    console.log("Avanzando 30 segundos");
+}
+
+/****************
+ * retroceder30()
+ ****************/
+function retroceder30(){
+    console.log("Retrocedo 30 segundos");
+}
+
+/****************
+ * getReproduciendo()
+ ****************/
+// Define la función getReproduciendo como async para poder usar await
+async function getReproduciendo() {
+    try {
+        const response = await fetch('/getVideoReproduciendo');
+        const data = await response.json();
+        const videoReproduciendo = data.video;
+        console.log("Reproduciendo obtenido de /getVideoReproduciendo: " + videoReproduciendo);
+        const fechaHoraActual = obtenerFechaYHora();
+        agregarEvento(fechaHoraActual + " - Video Reproduciendo cargado de Backend: " + videoReproduciendo);
+        return videoReproduciendo;
+    } catch (error) {
+        return "";
+    }
+}
+
+/****************
+ * obtenerFechaYHora()
+ * Obtiene la fecha/hora para agregarEvento al visor de eventos
+ ****************/
+function obtenerFechaYHora() {
+    const fecha = new Date();
+  
+    // Obtener año, mes y día
+    const year = fecha.getFullYear();
+    const month = String(fecha.getMonth() + 1).padStart(2, '0'); // El mes comienza en 0, así que agregamos 1 y formateamos con ceros a la izquierda si es necesario
+    const day = String(fecha.getDate()).padStart(2, '0');
+  
+    // Obtener horas, minutos y segundos
+    const hours = String(fecha.getHours()).padStart(2, '0');
+    const minutes = String(fecha.getMinutes()).padStart(2, '0');
+    const seconds = String(fecha.getSeconds()).padStart(2, '0');
+  
+    // Construir la cadena de fecha y hora en el formato deseado
+    const fechaYHora = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  
+    return fechaYHora;
+  }
+
+/****************
+ * init()
+ ****************/
+// Define una función async que contiene el evento DOMContentLoaded
+async function init() {
+    const reproduciendo = await getReproduciendo(); // Usa await dentro de una función async
+    if (reproduciendo !== "") {
+        videoReproduciendo = reproduciendo;
+    }
+    actualizarListaVideos();
+    setInterval(actualizarListaVideos, 5000);
+    setInterval(cargarClientes, 15000);
+}
+
 /************************************************** 
 * Listeners 
 **************************************************/
 document.getElementById('enviar').addEventListener('click', enviarDatos);
-document.addEventListener("DOMContentLoaded", function() {
-    actualizarListaVideos();
-    setInterval(actualizarListaVideos, 5000); // 5000 milisegundos = 5 segundos
-    setInterval(cargarClientes, 15000); // 5000 milisegundos = 5 segundos
-    
-});
-
+document.addEventListener("DOMContentLoaded", init);
 
 /** Listener de cambio de tema **/
 button.addEventListener('click', () => {
@@ -527,6 +592,16 @@ buttonSiguiente.addEventListener('click', () => {
 /** Listener de cambio de anterior **/
 buttonAnterior.addEventListener('click', () => {
     anterior();
+}); 
+
+/** Listener de cambio de anterior **/
+buttonAdelantar30s.addEventListener('click', () => {
+    avanzar30();
+}); 
+
+/** Listener de cambio de anterior **/
+buttonAtrasar30s.addEventListener('click', () => {
+    retroceder30();
 }); 
 
 /***************************************
