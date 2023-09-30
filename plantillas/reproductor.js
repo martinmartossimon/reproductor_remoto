@@ -198,8 +198,8 @@ function dibujarTablaReproduccion() {
             fila.dataset.id = id;
 
             const botones = document.createElement('td');
-            botones.innerHTML = `<button id="reproducir-${id}" onclick="reproducirVideo('${elemento.archivo}')">&#x25B6;</button>
-                                <button id="borrar-${id}" onclick="borrarVideo('${elemento.archivo}')">&#x1F5D1;</button>
+            botones.innerHTML = `<button class="button-claro" id="reproducir-${id}" onclick="reproducirVideo('${elemento.archivo}')">&#x25B6;</button>
+                                <button class="button-claro" id="borrar-${id}" onclick="borrarVideo('${elemento.archivo}')">&#x1F5D1;</button>
             `;
 
             fila.innerHTML = `
@@ -218,6 +218,16 @@ function dibujarTablaReproduccion() {
     const formatoFechaHora = fechaHora.toLocaleString(); // Convierte la fecha y hora a una cadena legible
     etiquetaUpdate = document.getElementById("ultimaActualizacion");
     etiquetaUpdate.innerHTML = "<p>Ultima actualizacion: " + formatoFechaHora + "</p>";
+
+    //Actualizo el tema de los botones
+    if (darkModeEnabled) {
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.classList.add('button-oscuro');
+        });
+    }
+
+
 }
 
 /***************************************

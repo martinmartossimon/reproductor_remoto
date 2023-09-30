@@ -3,6 +3,14 @@ Se trata de un aplicativo web donde se controla de manera remota los videos que 
 Los videos son reproucidos (y almacenados) desde el propio host de la aplicación, por lo que la latencia en la reproducción es mínima.
 
 
+# Uso con contenedor.
+Construimos la imagen con:  
+`docker build -t reproductor_remoto .`
+
+Lanzamos la instancia con:  
+`docker run -d -p 8000:8000 -p 8001:8001 -v $(pwd)/contenido:/app/contenido reproductor_remoto
+`
+
 # Por implementar:
 - Control de reproducción. Play/Pause/Vol+/Vol-
 - ~~Lista de Clientes conectados.~~

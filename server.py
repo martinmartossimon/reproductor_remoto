@@ -65,11 +65,13 @@ def listar_archivos_detalle():
         # archivos = [nombre for nombre in os.listdir(directorio) if nombre.endswith('.mp4')]
         archivos = [nombre for nombre in os.listdir(directorio) if nombre.endswith('.mp4')]
         # Ordeno por fecha de modificacion
+        print("archivos[]: ", archivos)
         archivos_ordenados = sorted(archivos, key=lambda x: os.path.getctime(os.path.join(directorio, x)))
         archivos_con_info = []
 
         #for nombre_archivo in archivos:
         for nombre_archivo in archivos_ordenados:
+            print("Procesando archivo: ", nombre_archivo)
             archivo_info = {}
             ruta_completa = os.path.join(directorio, nombre_archivo)
 
@@ -103,7 +105,12 @@ def listar_archivos_detalle():
 # Descarga un video de youtube
 def descargarVideoYoutube(url):
     urlLimpia = urllib.parse.unquote(url)
-    script_path = os.path.abspath('/home/tincho/Scripts/reproductor_remoto/descargadorYtb-dlp')
+    #script_path = os.path.abspath('/home/tincho/Scripts/reproductor_remoto/descargadorYtb-dlp')
+    # Obtener el directorio actual
+    directorio_actual = os.path.abspath(os.path.dirname(__file__))
+
+    # Ruta completa al script
+    script_path = os.path.join(directorio_actual, 'descargadorYtb-dlp')
     try:
         proceso = subprocess.Popen(f"sh {script_path} {urlLimpia}", shell=True)
         pid = proceso.pid
@@ -532,7 +539,8 @@ class EventosHandler(BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'text/event-stream')
             self.send_header('Cache-Control', 'no-cache')
             self.send_header('Connection', 'keep-alive')
-            self.send_header('Access-Control-Allow-Origin', f'http://{server_ip}:8000')  # Reemplaza 8000 por el puerto adecuado
+            #self.send_header('Access-Control-Allow-Origin', f'http://{server_ip}:8000')  # Reemplaza 8000 por el puerto adecuado
+            self.send_header("Access-Control-Allow-Origin", "*")  # * permite cualquier origen
             self.end_headers()
             
             # Agregar el cliente a la lista de clientes
@@ -605,7 +613,8 @@ class EventosHandler(BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'text/event-stream')
             self.send_header('Cache-Control', 'no-cache')
             self.send_header('Connection', 'keep-alive')
-            self.send_header('Access-Control-Allow-Origin', f'http://{server_ip}:8000')  # Reemplaza 8000 por el puerto adecuado
+            #self.send_header('Access-Control-Allow-Origin', f'http://{server_ip}:8000')  # Reemplaza 8000 por el puerto adecuado
+            self.send_header("Access-Control-Allow-Origin", "*")  # * permite cualquier origen
             self.end_headers()
 
             
@@ -653,11 +662,11 @@ def iniciar_servidores():
     PORT = 8000
     eventos_port = 8001  # Puerto para el servidor de eventos
     # Crear el servidor web en un hilo
-    with ThreadingHTTPServer(("", PORT), RequestHandler) as httpd:
+    with ThreadingHTTPServer(("0.0.0.0", PORT), RequestHandler) as httpd:
         print(f"Servidor en el puerto {PORT}")
         
         # Crear el servidor de eventos en otro hilo
-        eventos_server = ThreadingHTTPServer(("", eventos_port), EventosHandler)
+        eventos_server = ThreadingHTTPServer(("0.0.0.0", eventos_port), EventosHandler)
         eventos_thread = threading.Thread(target=eventos_server.serve_forever)
         eventos_thread.start()
       
