@@ -11,10 +11,10 @@ echo "`date +'%d/%m/%Y %H:%M:%S'` - Llamado a descargador con URL: $URL" > $LOG
 #/usr/bin/yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "./contenido/%(title)s.%(ext)s" $URL
 
 
-$ruta_yt_dlp=$(whereis yt-dlp | awk '{print $2}')
+#$ruta_yt_dlp=$(whereis yt-dlp | awk '{print $2}')
 
 #Lo descarga max en 1080
-/usr/bin/yt-dlp -f 'best[height<=1080]+bestaudio/best' -o "./contenido/%(title)s.%(ext)s" $URL
+yt-dlp -f 'best[height<=1080]+bestaudio/best' -o "./contenido/%(title)s.%(ext)s" "$URL"
 #"${ruta_yt_dlp}" -f 'best[height<=1080]+bestaudio/best' -o "./contenido/%(title)s.%(ext)s" $URL
 
 pid=$!
@@ -22,12 +22,12 @@ echo "Arrancado el yt-dlp con el PID: $pid" >> $LOG
 
 wait $pid
 echo "Finaliza el yt-dlp con el PID: $pid" >> $LOG
-echo "`date +'%d/%m/%Y %H:%M:%S'` - Fin de la descarga->RENOMBRANDO--------" >> $LOG
+echo "$(date +'%d/%m/%Y %H:%M:%S') - Fin de la descarga->RENOMBRANDO--------" >> $LOG
 cd ./contenido/ || exit 2
 
 # Itera sobre los archivos en el directorio
 #for archivo in *; do
-echo "`date +'%d/%m/%Y %H:%M:%S'` - Renombrando Archivos Descargados"
+echo "$(date +'%d/%m/%Y %H:%M:%S') - Renombrando Archivos Descargados"
 for archivo in *; do
   # Verifica si el archivo es un archivo regular
   if [ -f "$archivo" ]; then
@@ -36,11 +36,11 @@ for archivo in *; do
     
     # Elimina caracteres especiales y espacios en blanco, y mantiene el "."
     #nuevo_nombre=$(echo "$archivo" | sed 's/[^a-zA-Z0-9.]/_/g')
-    nuevo_nombre=$(echo "$archivo" | sed 's/[^a-zA-Z0-9.]//g; s/á/a/g; s/é/e/g; s/í/i/g; s/ó/o/g; s/ú/u/g; s/Á/A/g; s/É/E/g; s/Í/i/g; s/Ó/O/g; s/Ú/U/g')
+    nuevo_nombre=$(echo "$archivo" | sed 's/[^a-zA-Z0-9.]//g; s/á/a/g; s/é/e/g; s/í/i/g; s/ó/o/g; s/ú/u/g; s/Á/A/g; s/É/E/g; s/Í/i/g; s/Ó/O/g; s/Ú/U/g; s/º//g')
     
     # Trunca la longitud del nombre del archivo a 10 caracteres (sin contar la extensión)
     nuevo_nombre=$(echo "$nuevo_nombre" | cut -c 1-15)".$extension"
-    if [[ "$archivo" != "$nuevo_nombre" ]]; then
+    if [ "$archivo" != "$nuevo_nombre" ]; then
     # Renombra el archivo
       mv "$archivo" "$nuevo_nombre"
     fi

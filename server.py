@@ -62,18 +62,23 @@ def obtener_duracion_video(ruta_archivo):
 # Genera un JSON similar a: [{"archivo": "13COMANDOSRAROS.mp4", "tamano": "939.55 MB", "Fecha_Creacion": "20/09/2023 13:38", "duracion_segundos": 991.747483, "duracion_hms": "00:16:31"}, {"archivo": "ConcordeJustKis.mp4", "tamano": "6.37 MB", "Fecha_Creacion": "20/09/2023 21:32", "duracion_segundos": 300.721633, "duracion_hms": "00:05:00"}]
 def listar_archivos_detalle(): 
     try:
+        print("Entro a listar_archivos_detalle()")
+        print("Entro a listar_archivos_detalle()", file=open("debug.log", "a"))
         # archivos = [nombre for nombre in os.listdir(directorio) if nombre.endswith('.mp4')]
         archivos = [nombre for nombre in os.listdir(directorio) if nombre.endswith('.mp4')]
+        print("contenido de archivos[]: " + str(archivos), file=open("debug.log", "a"))
         # Ordeno por fecha de modificacion
-        print("archivos[]: ", archivos)
+        # print("archivos[]: ", archivos)
         archivos_ordenados = sorted(archivos, key=lambda x: os.path.getctime(os.path.join(directorio, x)))
         archivos_con_info = []
 
         #for nombre_archivo in archivos:
         for nombre_archivo in archivos_ordenados:
-            print("Procesando archivo: ", nombre_archivo)
+            # print("Procesando archivo: ", nombre_archivo)
             archivo_info = {}
             ruta_completa = os.path.join(directorio, nombre_archivo)
+
+            print("Entro a procesar: " + nombre_archivo + " - ruta_completa: " + ruta_completa, file=open("debug.log", "a"))
 
             # Obtener el tamaño del archivo en MB o GB
             tamano = os.path.getsize(ruta_completa)
@@ -95,9 +100,11 @@ def listar_archivos_detalle():
             # Agregar la duración en segundos y en formato h:m:s
             archivo_info['duracion_segundos'] = duracion['segundos']
             archivo_info['duracion_hms'] = duracion['duracion']
+            print("Contenido de archivo_info: ", str(archivo_info), file=open("debug.log", "a"))
 
             archivos_con_info.append(archivo_info)
         #print(json.dumps(archivos_con_info, ensure_ascii=False))
+        print("JSON retornado en listar_archivos_detalle(): ", str(json.dumps(archivos_con_info, ensure_ascii=False)), file=open("debug.log", "a"))
         return json.dumps(archivos_con_info, ensure_ascii=False)
     except Exception as e:
         return str(e)
@@ -675,8 +682,7 @@ def iniciar_servidores():
 
         # Iniciar el servidor web
         httpd.serve_forever()
-
-        
+       
 
 if __name__ == "__main__":
     # Iniciar ambos servidores en hilos separados

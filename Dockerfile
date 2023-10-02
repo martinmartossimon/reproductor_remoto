@@ -10,7 +10,11 @@ COPY plantillas/ plantillas/
 COPY descargadorYtb-dlp .
 
 # Instala las dependencias si es necesario
- RUN pip install yt-dlp 
+RUN pip install --upgrade pip && pip install yt-dlp 
+
+RUN apt-get update && apt-get install -y vim
+RUN apt-get clean
+
 
 # Expón los puertos 8000 y 8001
 EXPOSE 8000
