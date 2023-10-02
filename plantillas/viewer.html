@@ -203,7 +203,88 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             setInterval(registrarCliente, 5000);
+            setInterval(enviarDetalleReproduccion, 5000);
         });
+
+        function obtenerFechaYHora() {
+            const fecha = new Date();
+        
+            // Obtener año, mes y día
+            const year = fecha.getFullYear();
+            const month = String(fecha.getMonth() + 1).padStart(2, '0'); // El mes comienza en 0, así que agregamos 1 y formateamos con ceros a la izquierda si es necesario
+            const day = String(fecha.getDate()).padStart(2, '0');
+        
+            // Obtener horas, minutos y segundos
+            const hours = String(fecha.getHours()).padStart(2, '0');
+            const minutes = String(fecha.getMinutes()).padStart(2, '0');
+            const seconds = String(fecha.getSeconds()).padStart(2, '0');
+        
+            // Construir la cadena de fecha y hora en el formato deseado
+            const fechaYHora = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        
+            return fechaYHora;
+        }
+
+        /*
+        * Envia al backend un JSON de ejemplo: {"cliente":"192.168.18.151","fechaMensaje":"2023-10-02 13:37:55","currentTime":0.837769,"duration":2465.146485,"progress":0.03398455244334091,"src":"http://192.168.18.151:8000/contenido/BOOMERSHOOTERIN.mp4"}
+         */
+        function enviarDetalleReproduccion(){
+            if(!videoPlayer.paused){
+                var currentTime = videoPlayer.currentTime;
+                var duration = videoPlayer.duration;
+                var progress = (currentTime / duration) * 100;
+                var src = videoPlayer.src;
+                fecha = obtenerFechaYHora();
+
+                //progressBar.value = progress;
+
+                var detalleReproduciendo = {
+                    cliente: host,
+                    fechaMensaje: fecha,
+                    currentTime: currentTime,
+                    duration: duration,
+                    progress: progress,
+                    src: src
+                }
+
+                // Convierte el objeto JSON en una cadena JSON
+                var jsonData = JSON.stringify(detalleReproduciendo);
+                console.log("Datos de reproducción a enviar: " + jsonData);
+
+                // Configura la URL del backend
+                var url = '/recibirDatosReproduciendo';
+
+                // Configura las opciones de la solicitud POST
+                var requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                    body: jsonData
+                };
+
+                // Realiza la solicitud fetch
+                fetch(url, requestOptions)
+                    .then(function(response) {
+                        if (!response.ok) {
+                        // Manejo de errores para respuestas no exitosas (por ejemplo, 404, 500)
+                        throw new Error('La solicitud no fue exitosa');
+                        }
+                        return response.text(); // Puedes usar response.json() si esperas una respuesta JSON
+                    })
+                    .then(function(data) {
+                        // Manejo de la respuesta exitosa del backend
+                        console.log('Respuesta del backend:', data);
+                    })
+                    .catch(function(error) {
+                        // Manejo de errores generales (por ejemplo, problemas de red)
+                        console.error('Error:', error);
+                });
+            }
+            else{
+                console.log("No envio detalle de reproduccion ya que no hay video reproduciendo");
+            }
+        }
     </script>
 </body>
 </html>

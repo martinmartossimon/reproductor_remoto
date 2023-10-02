@@ -9,8 +9,12 @@
 </head>
 <body>
     <h1>Servidor:</h1>
-    <div class="controlesReproduccion">
-        <span id="reproduciendo">Reproduciendo: </span>
+    <div class="detalleReproduciendo">
+        <table>
+            <tr>
+                <td><span id="spanReproduciendo">Reproduciendo: </span></td><td><progress id="progressBar" value="0" max="100" style="width: 400px;"></progress></td>
+            </tr>
+        </table>
     </div>
     <div class="anadir">
         Añadir Enlace: <input type="text" id="url" class="input-personalizado" size="100" placeholder="https://www.youtube.com/watch?v=wMye9FkQEfo"><button id="enviar" class="button-claro">Enviar</button>

@@ -2,6 +2,7 @@ console.log("Arrancando el Reproductor importado en .js");
 console.log("Inicializando variables...");
 // Variables Globales
 let videoReproduciendo = ""; // identificador con el nombredelfichero.mp4
+let progresoVideoEnReproduccion = 0;
 let elementos = []; // Array donde voy a guardar el resultado al consultar el listado de Archivos de /listar_archivos_detalle
 let darkModeEnabled = false;
 
@@ -20,7 +21,8 @@ const buttonAtrasar60s = document.getElementById('atrasar60s');
 const buttonAdelantar60s = document.getElementById('adelantar60s');
 const buttonPause = document.getElementById('pause');
 const buttonMute = document.getElementById('mute');
-
+const spanReproduciendo = document.getElementById('spanReproduciendo');
+const progressBarReproduciendo = document.getElementById('progressBar');
 /******************
 * MOSTRAR POPUP
 *******************/
@@ -170,6 +172,7 @@ function reproducirVideo(video) {
                     dibujarTablaReproduccion();
                     // Marco el video en reproduccion
                     marcarFilaReproduccion();
+                    spanReproduciendo.innerHTML = "Reproduciendo: " + videoReproduciendo;
                 })
                 .catch(error => {
                     console.error('Error al obtener la lista de detalles:', error);
@@ -539,9 +542,13 @@ async function getReproduciendo() {
         const response = await fetch('/getVideoReproduciendo');
         const data = await response.json();
         const videoReproduciendo = data.video;
-        console.log("Reproduciendo obtenido de /getVideoReproduciendo: " + videoReproduciendo);
+        const progreso = data.progreso;
+        console.log("Reproduciendo obtenido de /getVideoReproduciendo: " + videoReproduciendo + " progreso: " + progreso);
         const fechaHoraActual = obtenerFechaYHora();
-        agregarEvento(fechaHoraActual + " - Video Reproduciendo cargado de Backend: " + videoReproduciendo);
+        //agregarEvento(fechaHoraActual + " - Video Reproduciendo cargado de Backend: " + videoReproduciendo);
+
+        spanReproduciendo.innerHTML = "Reproduciendo: " + videoReproduciendo;
+        progressBarReproduciendo.value = progreso;
         return videoReproduciendo;
     } catch (error) {
         return "";
@@ -617,6 +624,7 @@ async function init() {
     actualizarListaVideos();
     setInterval(actualizarListaVideos, 5000);
     setInterval(cargarClientes, 15000);
+    setInterval(await getReproduciendo, 5000);
 }
 
 /************************************************** 

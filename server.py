@@ -20,6 +20,7 @@ clientes_eventos = [] #Lista de objetos EventosHandler
 servidor_eventos = [] #Lista de objetos EventosHandler
 clientes = [] #Lista strings de IP de clientes
 videoEnReproduccion=""
+progresoVideoEnReproduccion = 0
 
 # Deprecado
 def listar_archivos():
@@ -342,14 +343,16 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(json_string.encode('utf-8'))
         # Retorna si existe algun video en reproduccion para actualizar el servidor
         elif self.path == '/getVideoReproduciendo':
-            print("Valor de videoEnReproduccion: ", videoEnReproduccion)
+            print("Valor de videoEnReproduccion: ", videoEnReproduccion, " - Progreso: ", str(progresoVideoEnReproduccion))
             respuesta = {}
             if videoEnReproduccion != "":
                 print("Existe un video en reproduccion: " + videoEnReproduccion)
                 respuesta["video"] = videoEnReproduccion
+                respuesta["progreso"] = progresoVideoEnReproduccion
             else:
                 print("NO EXISTE un video en reproduccion")
                 respuesta["video"] = ""
+                respuesta["progreso"] = 0
 
             json_respuesta = json.dumps(respuesta)
             self.send_response(200)
@@ -495,6 +498,28 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps({"mensaje": "Accion enviada a los clientes"}).encode('utf-8'))
                 return
+            except json.JSONDecodeError:
+                self.send_response(400)  # Devuelve un código de respuesta 400 si los datos no son JSON válidos
+                self.send_header('Content-type', 'text/plain')
+                self.end_headers()
+                self.wfile.write("Datos JSON no válidos".encode())
+        # recibirDatosReproduciendo - Recibe JSON como este: {"cliente":"192.168.18.151","fechaMensaje":"2023-10-02 13:37:55","currentTime":0.837769,"duration":2465.146485,"progress":0.03398455244334091,"src":"http://192.168.18.151:8000/contenido/BOOMERSHOOTERIN.mp4"}
+        elif self.path == '/recibirDatosReproduciendo':
+            print("Recibidos datos de Reproduccion")
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                # Decodifica el JSON recibido
+                data = json.loads(post_data.decode())
+                print("/recibirDatosReproduciendo - JSON Recibido", str(data))
+                global progresoVideoEnReproduccion
+                progresoVideoEnReproduccion = data.get('progress')
+                print("Establezco progresoVideoEnReproduccion: ", str(progresoVideoEnReproduccion))
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"mensaje": "JSON Recibido Correctamente."}).encode('utf-8'))
             except json.JSONDecodeError:
                 self.send_response(400)  # Devuelve un código de respuesta 400 si los datos no son JSON válidos
                 self.send_header('Content-type', 'text/plain')

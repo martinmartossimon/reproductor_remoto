@@ -337,3 +337,13 @@ body.dark-theme .input-personalizado:focus {
     background-color: #28A745; /* Fondo verde al pasar el mouse */
     color: #fff; /* Texto blanco al pasar el mouse */
   }
+
+  .detalleReproduciendo {
+    position: fixed;
+    font-size: 12px;
+    bottom: 0;
+    left: 0;
+    width: 50%;
+    /* background-color: #7afd00; */
+    z-index: 999; /* Asegura que esté por encima del resto del contenido */
+  }
