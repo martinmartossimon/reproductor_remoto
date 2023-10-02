@@ -1,50 +1,17 @@
 #!/bin/bash
 
-#LOG=/home/tincho/Scripts/reproductor_remoto/logDownloader.log
-LOG=logDownloader.log
-
 URL=$1
-echo "`date +'%d/%m/%Y %H:%M:%S'` - Llamado a descargador con URL: $URL" > $LOG
-#yt-dlp -f 'best[height<=1080]+bestaudio/best' -o "./contenido/%(title)s.%(ext)s" $URL
 
-#Lo descarga en 4K, y lo limito
-#/usr/bin/yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "./contenido/%(title)s.%(ext)s" $URL
+#URL="https://www.youtube.com/watch?v=FNzSF-0TM2w"
 
+nombreOriginal=$(yt-dlp --get-filename -o "%(title)s.%(ext)s" "$URL")
+echo "nombreOriginal=$nombreOriginal"
 
-#$ruta_yt_dlp=$(whereis yt-dlp | awk '{print $2}')
+nombreSrc=$(echo "$nombreOriginal" | sed 's/[^a-zA-Z0-9. ]//g; s/á/a/g; s/é/e/g; s/í/i/g; s/ó/o/g; s/ú/u/g; s/Á/A/g; s/É/E/g; s/Í/i/g; s/Ó/O/g; s/Ú/U/g; s/º//g; s/  / /g ' | sed 's/ /_/g' | sed 's/.webm//g')
+echo "nombreSrc=$nombreSrc"
 
-#Lo descarga max en 1080
-yt-dlp -f 'best[height<=1080]+bestaudio/best' -o "./contenido/%(title)s.%(ext)s" "$URL"
-#"${ruta_yt_dlp}" -f 'best[height<=1080]+bestaudio/best' -o "./contenido/%(title)s.%(ext)s" $URL
+echo "Descargando el video"
+yt-dlp -f 'best[height<=1080]+bestaudio/best' -o "./contenido/$nombreSrc.%(ext)s" "$URL"
 
-pid=$!
-echo "Arrancado el yt-dlp con el PID: $pid" >> $LOG
-
-wait $pid
-echo "Finaliza el yt-dlp con el PID: $pid" >> $LOG
-echo "$(date +'%d/%m/%Y %H:%M:%S') - Fin de la descarga->RENOMBRANDO--------" >> $LOG
-cd ./contenido/ || exit 2
-
-# Itera sobre los archivos en el directorio
-#for archivo in *; do
-echo "$(date +'%d/%m/%Y %H:%M:%S') - Renombrando Archivos Descargados"
-for archivo in *; do
-  # Verifica si el archivo es un archivo regular
-  if [ -f "$archivo" ]; then
-    # Obtén la extensión del archivo
-    extension="${archivo##*.}"
-    
-    # Elimina caracteres especiales y espacios en blanco, y mantiene el "."
-    #nuevo_nombre=$(echo "$archivo" | sed 's/[^a-zA-Z0-9.]/_/g')
-    nuevo_nombre=$(echo "$archivo" | sed 's/[^a-zA-Z0-9.]//g; s/á/a/g; s/é/e/g; s/í/i/g; s/ó/o/g; s/ú/u/g; s/Á/A/g; s/É/E/g; s/Í/i/g; s/Ó/O/g; s/Ú/U/g; s/º//g')
-    
-    # Trunca la longitud del nombre del archivo a 10 caracteres (sin contar la extensión)
-    nuevo_nombre=$(echo "$nuevo_nombre" | cut -c 1-15)".$extension"
-    if [ "$archivo" != "$nuevo_nombre" ]; then
-    # Renombra el archivo
-      mv "$archivo" "$nuevo_nombre"
-    fi
-  fi
-done
-
-echo "`date +'%d/%m/%Y %H:%M:%S'` - Fin del RENOMBRANDO" >> $LOG
+echo "Descargando miniatura"
+yt-dlp --get-thumbnail -o "%(thumbnail)s" "$URL" | xargs -I {} curl -S -o ./contenido/"$nombreSrc".jpg {}
