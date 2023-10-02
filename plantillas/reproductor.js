@@ -18,6 +18,8 @@ const buttonAtrasar30s = document.getElementById('atrasar30s');
 const buttonAdelantar30s = document.getElementById('adelantar30s');
 const buttonAtrasar60s = document.getElementById('atrasar60s');
 const buttonAdelantar60s = document.getElementById('adelantar60s');
+const buttonPause = document.getElementById('pause');
+const buttonMute = document.getElementById('mute');
 
 /******************
 * MOSTRAR POPUP
@@ -506,6 +508,29 @@ function retroceder60(){
 }
 
 /****************
+ * retroceder60()
+ ****************/
+ function pause(){
+    gestionDeFlujoReproduccion("pause");
+    estado = buttonPause.innerHTML;
+    if (estado == "Pause") {
+        buttonPause.innerHTML = "Reanudar";
+    } else {
+        buttonPause.innerHTML = "Pause";
+    }
+    console.log("Pause");
+
+}
+
+/****************
+ * retroceder60()
+ ****************/
+ function mute(){
+    gestionDeFlujoReproduccion("mute");
+    console.log("Mute");
+}
+
+/****************
  * getReproduciendo()
  ****************/
 // Define la función getReproduciendo como async para poder usar await
@@ -547,7 +572,7 @@ function obtenerFechaYHora() {
   }
 
 function gestionDeFlujoReproduccion(accion){
-//accion pueden ser "+30", "-30", "+60", "-60"
+//accion pueden ser "+30", "-30", "+60", "-60", "pause", "mute"
     const datos = {control: accion};
     const jsonDatos = JSON.stringify(datos);
     console.log("JSON de control de flujo: " + jsonDatos);
@@ -688,6 +713,16 @@ buttonAdelantar60s.addEventListener('click', () => {
 /** Listener de cambio de anterior **/
 buttonAtrasar60s.addEventListener('click', () => {
     retroceder60();
+});
+
+/** Listener de stop **/
+buttonPause.addEventListener('click', () => {
+    pause();
+});
+
+/** Listener de mute **/
+buttonMute.addEventListener('click', () => {
+    mute();
 });
 
 /***************************************

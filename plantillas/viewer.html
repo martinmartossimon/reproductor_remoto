@@ -53,6 +53,10 @@
         const eventSource = new EventSource(url);
         //const eventSource = new EventSource('http://localhost:8001/eventos');
 
+        // Variables globales
+        var previousVolume = videoPlayer.volume || 1.0;
+
+
         // Maneja eventos recibidos del servidor
         eventSource.onmessage = function(event) {
             const data = JSON.parse(event.data);
@@ -144,6 +148,27 @@
                     videoPlayer.currentTime = 0;
                     console.log('El nuevo segundo es anterior a 0 la duración del video.');
                 }
+            }
+
+            if (data.control === "pause" ){
+                console.log("Llamada a pause");
+                if (videoPlayer.paused) {
+                    videoPlayer.play();
+                } else {
+                    videoPlayer.pause();
+                }
+            }
+
+            if (data.control === "mute" ){
+                console.log("Llamada a mute");               
+                if (videoPlayer.volume > 0) {
+                // Guarda el volumen previo y establece el volumen en 0 (silencio)
+                previousVolume = videoPlayer.volume;
+                videoPlayer.volume = 0;
+                } else {
+                    videoPlayer.volume = previousVolume;
+                }
+
             }
         };
 
