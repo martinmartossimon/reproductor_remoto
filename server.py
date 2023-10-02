@@ -61,6 +61,8 @@ def obtener_duracion_video(ruta_archivo):
 
 # Genera un JSON similar a: [{"archivo": "13COMANDOSRAROS.mp4", "tamano": "939.55 MB", "Fecha_Creacion": "20/09/2023 13:38", "duracion_segundos": 991.747483, "duracion_hms": "00:16:31"}, {"archivo": "ConcordeJustKis.mp4", "tamano": "6.37 MB", "Fecha_Creacion": "20/09/2023 21:32", "duracion_segundos": 300.721633, "duracion_hms": "00:05:00"}]
 def listar_archivos_detalle(): 
+    print("Directorio actual:", os.getcwd(), file=open("debug.log", "a"))
+    print("Variables de entorno:", os.environ, file=open("debug.log", "a"))
     try:
         print("Entro a listar_archivos_detalle()")
         print("Entro a listar_archivos_detalle()", file=open("debug.log", "a"))
