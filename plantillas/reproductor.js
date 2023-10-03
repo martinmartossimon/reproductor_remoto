@@ -23,6 +23,11 @@ const buttonPause = document.getElementById('pause');
 const buttonMute = document.getElementById('mute');
 const spanReproduciendo = document.getElementById('spanReproduciendo');
 const progressBarReproduciendo = document.getElementById('progressBar');
+
+// Otros elementos o variables que necesito:
+var miniaturaDiv; // Declaración global de la variable
+
+
 /******************
 * MOSTRAR POPUP
 *******************/
@@ -203,15 +208,26 @@ function dibujarTablaReproduccion() {
             fila.dataset.id = id;
 
             const botones = document.createElement('td');
-            botones.innerHTML = `<button class="button-claro" id="reproducir-${id}" onclick="reproducirVideo('${elemento.archivo}')">&#x25B6;</button>
-                                <button class="button-claro" id="borrar-${id}" onclick="borrarVideo('${elemento.archivo}')">&#x1F5D1;</button>
+
+            // Crea un div para los botones
+            const divBotones = document.createElement('div');
+            divBotones.className = 'botones';
+
+            divBotones.innerHTML = `
+                <button class="button-claro" id="reproducir-${id}" onclick="reproducirVideo('${elemento.archivo}')">&#x25B6;</button>
+                <button class="button-claro" id="borrar-${id}" onclick="borrarVideo('${elemento.archivo}')">&#x1F5D1;</button>
+                <div id="contenedor-lupa" onmouseleave="ocultarMiniatura()">
+                <button class="button-claro" id="mostrar-${id}" onmouseover="mostrarMiniatura('${elemento.archivo}')">&#128269;</button>
+                </div>
             `;
+
+            // Agrega el div de botones a la fila
+            botones.appendChild(divBotones);
 
             fila.innerHTML = `
                 <td>${id}</td>                       
                 <td>${elemento.archivo}</td>
                 ${botones.outerHTML}
-                <td>${elemento.archivo}</td>
                 <td>${elemento.tamano}</td>
                 <td>${elemento.Fecha_Creacion}</td>
                 <td>${elemento.duracion_hms}</td>
@@ -231,8 +247,6 @@ function dibujarTablaReproduccion() {
             button.classList.add('button-oscuro');
         });
     }
-
-
 }
 
 /***************************************
@@ -274,6 +288,8 @@ function marcarFilaReproduccion(){
     } else {
         console.log(`El video "${videoReproduciendo}" no se encontró en el array elementos.`);
     }
+    // Oculto la miniatura en el caso que se haya quedado creada.
+    ocultarMiniatura()
 }
 
 /******************************** 
@@ -409,6 +425,45 @@ function getListaArchivosSinPromesa() {
         .catch(error => {
             reject(error); // Rechaza la promesa en caso de error
         });
+}
+
+/****************
+ * mostrarMiniatura()
+ ****************/
+function mostrarMiniatura(archivo) {
+    // Busco la fila para obtener la lupa correspondiente
+    const filaStr = elementos.findIndex(elemento => elemento.archivo === videoReproduciendo);
+    const indiceEntero = parseInt(filaStr); // Convierte a entero
+
+    indiceDeFila = indiceEntero + 1;
+    // Busca el elemento con el ID correspondiente
+    var lupaBoton = document.getElementById('mostrar-' + indiceDeFila);
+
+    if (lupaBoton) {
+        // Cambia la extensión de .mp4 a .jpg en el nombre del archivo
+        var nombreArchivoJPG = archivo.replace(/\.mp4$/, '.jpg');
+
+        // Crea un div para la miniatura y establece el tamaño máximo
+        miniaturaDiv = document.createElement('div');
+        miniaturaDiv.className = 'miniatura';
+        
+        // Crea una imagen dentro del div de la miniatura y haz que se ajuste al tamaño del div
+        var imagen = document.createElement('img');
+        imagen.src = '/contenido/' + nombreArchivoJPG;
+        miniaturaDiv.appendChild(imagen);
+
+        // Agrega el div de la miniatura al cuerpo del documento
+        document.body.appendChild(miniaturaDiv);       
+    } else {
+        // El elemento no se encontró, muestra un mensaje de error o maneja la situación según sea necesario
+        console.error("El elemento lupaBoton no se encontró.");
+    }
+}
+
+function ocultarMiniatura() {
+    if (miniaturaDiv) {
+        document.body.removeChild(miniaturaDiv);
+    }
 }
 
 

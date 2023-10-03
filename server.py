@@ -253,6 +253,26 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 pathBuscado='Archivo no encontrado en: .' + template_path + "cliente.html"
                 self.wfile.write(pathBuscado.encode())
+        # Servicio de imágenes .jpg desde el directorio "contenido"
+        elif self.path.startswith('/contenido/') and self.path.endswith('.jpg'):
+            try:
+                with open('.' + self.path, 'rb') as file:
+                    content = file.read()
+                self.send_response(200)  # Código de respuesta OK (200 OK)
+                self.send_header('Content-type', 'image/jpeg')  # Tipo de contenido para imágenes JPEG
+                self.send_header('Content-Length', len(content))  # Indica el tamaño total de la imagen
+                self.end_headers()
+                self.wfile.write(content)
+            except FileNotFoundError:
+                self.send_response(404)
+                self.send_header('Content-type', 'text/plain')
+                self.end_headers()
+                self.wfile.write("Imagen no encontrada".encode())
+            except ConnectionResetError as e:
+                # Captura la excepción ConnectionResetError
+                print(f"Se produjo un error de conexión: {e}")
+                # Imprime un mensaje personalizado
+                print("La conexión se restableció abruptamente por el cliente por cambio de imagen.")
         # Servicio del contenidos de manera progresiva.
         elif self.path.startswith('/contenido/'):
             # Sirve archivos de video desde la carpeta "contenido"
@@ -439,6 +459,11 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 if video_a_borrar:
                     # Construye la ruta completa al video a borrar
                     video_path = os.path.join(directorio, video_a_borrar)
+                    # Obtén el nombre del archivo sin la extensión
+                    nombre_base = os.path.splitext(video_a_borrar)[0]
+                    # Establece la nueva extensión (jpg en este caso)
+                    nueva_extension = ".jpg"
+                    miniatura_path = os.path.join(directorio, nombre_base + nueva_extension)
                     
                     # Verifica si el archivo existe y es un archivo regular (no un directorio)
                     if os.path.isfile(video_path):
@@ -459,6 +484,12 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                         data["tipo"] = "Informativo"
                         data["mensaje"] = "Borrado el video: " + video_a_borrar
                         mensajes_servidor.append(data)
+                        # Borra la miniatura
+                        print("Borrando Miniatura en: ", miniatura_path)
+                        if os.path.isfile(miniatura_path):
+                            os.remove(miniatura_path)
+                            print("!! - Archivo Borrado: ", miniatura_path)
+
 
                     else:
                         # Si el archivo no existe, devuelve un mensaje de error

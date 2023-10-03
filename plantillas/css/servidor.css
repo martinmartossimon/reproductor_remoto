@@ -116,6 +116,12 @@ tr:nth-child(odd) {
     background-color: yellow;
 }
 
+/* Aplica estilos a la columna "Archivo" */
+#tablaListaReproduccion td:nth-child(2) {
+    max-width: 350px; /* Establece el ancho máximo deseado */
+    overflow-wrap: break-word; /* Permite que el texto se divida en dos líneas si es necesario */
+}
+
 td {
     padding: 5px;
     text-align: left;
@@ -141,6 +147,22 @@ td {
     font-size: 10px;
 }
 
+/* Agrega un estilo CSS para posicionar la miniatura */
+.miniatura {
+    position: absolute;
+    top: 90%; /* Centra verticalmente en el 50% de la altura de la pantalla */
+    left: 87.5%; /* Centra horizontalmente en el 50% del ancho de la pantalla */
+    transform: translate(-50%, -50%); /* Centra exactamente en el centro */
+    width: 250px; /* Ancho máximo */
+    height: 250px; /* Alto máximo */
+}
+
+/* Establece un tamaño máximo para la imagen dentro de la miniatura */
+.miniatura img {
+    max-width: 100%; /* La imagen se ajusta al ancho máximo del div */
+    max-height: 100%; /* La imagen se ajusta al alto máximo del div */
+}
+
 /* Aplica un ancho máximo para la tabla y centra su contenido */
 #tableControlesReproduccion {
     max-width: 100%; /* Establece el ancho máximo en función del contenedor */
@@ -148,13 +170,16 @@ td {
   }
   
   /* Ajusta la alineación y el espaciado de las celdas de la tabla */
-  #tableControlesReproduccion td {
+#tableControlesReproduccion td {
     white-space: nowrap; /* Evita el desbordamiento del contenido */
     padding: 5px, 5px; /* Espaciado interno de las celdas */
     text-align: center; /* Alinea el contenido al centro */
     /*border: 1px solid #ddd; /* Agrega bordes para separar las celdas */
   }
-
+#contenedor-lupa {
+    display: inline-block; /* Muestra el elemento en línea con el contenido circundante */
+    padding: 0; /* Elimina el padding */
+}
 /* Popup */
 .popup {
     display: none;
