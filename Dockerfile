@@ -12,7 +12,8 @@ COPY descargadorYtb-dlp .
 # Instala las dependencias si es necesario
 RUN pip install --upgrade pip && pip install yt-dlp 
 
-RUN apt-get update && apt-get install -y vim ffmpeg
+#RUN apt-get update && apt-get install -y vim ffmpeg
+RUN apt-get install -y ffmpeg
 RUN apt-get clean
 
 
