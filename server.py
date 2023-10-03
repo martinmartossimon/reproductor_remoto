@@ -361,16 +361,16 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             # Ahora puedes enviar 'json_string' al cliente
             #print(json_string.encode('utf-8'))
             self.wfile.write(json_string.encode('utf-8'))
-        # Retorna si existe algun video en reproduccion para actualizar el servidor
+        # Retorna si existe algun video en reproduccion para actualizar el servidor y su progreso. Envía un JSON como: {"video": "HECD_316_Feijo_sigue_pensando_que_gan_las_elecciones.mp4", "progreso": 0.5377149277812309}'
         elif self.path == '/getVideoReproduciendo':
-            print("Valor de videoEnReproduccion: ", videoEnReproduccion, " - Progreso: ", str(progresoVideoEnReproduccion))
+            #print("Valor de videoEnReproduccion: ", videoEnReproduccion, " - Progreso: ", str(progresoVideoEnReproduccion))
             respuesta = {}
             if videoEnReproduccion != "":
-                print("Existe un video en reproduccion: " + videoEnReproduccion)
+                #print("Existe un video en reproduccion: " + videoEnReproduccion)
                 respuesta["video"] = videoEnReproduccion
                 respuesta["progreso"] = progresoVideoEnReproduccion
             else:
-                print("NO EXISTE un video en reproduccion")
+                #print("NO EXISTE un video en reproduccion")
                 respuesta["video"] = ""
                 respuesta["progreso"] = 0
 
@@ -378,7 +378,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
-            print("Respuesta de /getVideoReproduciendo", json_respuesta.encode('utf-8'))
+            #print("Respuesta de /getVideoReproduciendo", json_respuesta.encode('utf-8'))
             self.wfile.write(json_respuesta.encode('utf-8'))
         # Endpoint no encontrado
         else:
