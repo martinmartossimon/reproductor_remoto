@@ -536,16 +536,16 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write("Datos JSON no válidos".encode())
         # recibirDatosReproduciendo - Recibe JSON como este: {"cliente":"192.168.18.151","fechaMensaje":"2023-10-02 13:37:55","currentTime":0.837769,"duration":2465.146485,"progress":0.03398455244334091,"src":"http://192.168.18.151:8000/contenido/BOOMERSHOOTERIN.mp4"}
         elif self.path == '/recibirDatosReproduciendo':
-            print("Recibidos datos de Reproduccion")
+            #print("Recibidos datos de Reproduccion")
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             try:
                 # Decodifica el JSON recibido
                 data = json.loads(post_data.decode())
-                print("/recibirDatosReproduciendo - JSON Recibido", str(data))
+                #print("/recibirDatosReproduciendo - JSON Recibido", str(data))
                 global progresoVideoEnReproduccion
                 progresoVideoEnReproduccion = data.get('progress')
-                print("Establezco progresoVideoEnReproduccion: ", str(progresoVideoEnReproduccion))
+                #print("Establezco progresoVideoEnReproduccion: ", str(progresoVideoEnReproduccion))
                 
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
