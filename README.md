@@ -24,6 +24,15 @@ cd reproductor_remoto/
 docker build -t reproductor_remoto . && docker run --rm --name reproductor_remoto -p 8000:8000 -p 8001:8001 -v $(pwd)/contenido:/app/contenido reproductor_remoto
 ```
 
+# Uso de la aplicación:
+En el host que va a dirigir la reproducción en los clientes abrir la url:   
+`http://IP:8000/servidor`   
+
+
+En los hosts clientes abrir la url:  
+`http://IP:8000/viewer`
+
+
 # Por implementa:
 - ~~Control de reproducción. Play/Pause/+30/+60/-30/+30-~~
 - ~~Lista de Clientes conectados.~~
