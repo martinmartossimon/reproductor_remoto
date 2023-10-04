@@ -432,7 +432,7 @@ function getListaArchivosSinPromesa() {
  ****************/
 function mostrarMiniatura(archivo) {
     // Busco la fila para obtener la lupa correspondiente
-    const filaStr = elementos.findIndex(elemento => elemento.archivo === videoReproduciendo);
+    const filaStr = elementos.findIndex(elemento => elemento.archivo === archivo);
     const indiceEntero = parseInt(filaStr); // Convierte a entero
 
     indiceDeFila = indiceEntero + 1;
