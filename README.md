@@ -1,6 +1,6 @@
 # Reproductor Remoto
 <p align="center">
-<img src="https://github.com/martinmartossimon/reproductor_remoto/blob/main/imagenes/screenshot.png" width="30%" height="30%"><img src="https://github.com/martinmartossimon/reproductor_remoto/blob/main/imagenes/dark-theme.png" width="30%" height="30%">
+<img src="https://github.com/martinmartossimon/reproductor_remoto/blob/main/imagenes/screenshot.png" width="40%" height="40%">  <img src="https://github.com/martinmartossimon/reproductor_remoto/blob/main/imagenes/dark-theme.png" width="40%" height="40%">
 <p>
 
 
