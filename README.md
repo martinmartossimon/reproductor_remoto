@@ -1,6 +1,7 @@
 # Reproductor Remoto
+<p align="center">
 <img src="https://github.com/martinmartossimon/reproductor_remoto/blob/main/imagenes/screenshot.png" width="30%" height="30%"><img src="https://github.com/martinmartossimon/reproductor_remoto/blob/main/imagenes/dark-theme.png" width="30%" height="30%">
-
+<p>
 
 
 Se trata de un aplicativo web donde se controla de manera remota los videos que los clientes reproducen en un navegador web tan sólo accediendo a una url desde el cliente(s). También tiene la opción para descargar videos directamente de plataformas como: youtube... los cuales aparecen listados en una lista de reproducción. Todas las labores de reproducción se realizan desde una web que se encarga de enviar los videos a reproducir a todos los clientes.
